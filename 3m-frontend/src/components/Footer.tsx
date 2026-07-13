@@ -144,7 +144,7 @@ export const Footer: React.FC = () => {
                 <a href="#" className="hover:text-white hover:underline decoration-neutral-700 transition-colors">{t.returnPolicy}</a>
               </li>
               <li>
-                <a href="#" className="hover:text-white hover:underline decoration-neutral-700 transition-colors">{t.contactUs}</a>
+                <Link to="/about" className="hover:text-white hover:underline decoration-neutral-700 transition-colors">{t.contactUs}</Link>
               </li>
             </ul>
           </div>
