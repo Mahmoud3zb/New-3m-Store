@@ -1,0 +1,198 @@
+﻿
+E:\3m Store\3m_frontend\src\components\FeaturedProduct.tsx
+  23:6   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\components\NewArrivals.tsx
+  64:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\components\ui\button.tsx
+  58:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+E:\3m Store\3m_frontend\src\features\admin\AdminDashboardView.tsx
+   26:37  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   29:31  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   30:35  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   31:39  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   34:45  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   35:49  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   36:53  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   39:49  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   42:55  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   43:47  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   44:57  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   45:49  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   48:43  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   50:57  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   52:59  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/rules-of-hooks
+   94:3   error  React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/rules-of-hooks
+   95:33  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\admin\AdminDashboardView.tsx:95:33
+  93 |
+  94 |   useEffect(() => {
+> 95 |     if (activeTab === 'orders') fetchOrders();
+     |                                 ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  96 |     if (activeTab === 'products') {
+  97 |       fetchProducts();
+  98 |       fetchCategories();  react-hooks/set-state-in-effect
+  108:88  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  174:19  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  207:19  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  229:19  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\admin\components\CategoryModal.tsx
+  25:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\admin\components\CategoryModal.tsx:25:7
+  23 |   useEffect(() => {
+  24 |     if (editingCategory) {
+> 25 |       setCatName(editingCategory.name);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  26 |       setCatDesc(editingCategory.description || '');
+  27 |     } else {
+  28 |       setCatName('');  react-hooks/set-state-in-effect
+
+E:\3m Store\3m_frontend\src\features\admin\components\ProductModal.tsx
+  44:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\admin\components\ProductModal.tsx:44:7
+  42 |   useEffect(() => {
+  43 |     if (editingProduct) {
+> 44 |       setProdName(editingProduct.name);
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  45 |       setProdDesc(editingProduct.description || '');
+  46 |       setProdPrice(editingProduct.price.toString());
+  47 |       setProdQty(editingProduct.quantity.toString());  react-hooks/set-state-in-effect
+
+E:\3m Store\3m_frontend\src\features\admin\components\UsersTab.tsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\admin\components\UsersTab.tsx:28:5
+  26 |
+  27 |   useEffect(() => {
+> 28 |     fetchUsers();
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |   }, []);
+  30 |
+  31 |   const handleDeleteUser = async (id: string, name: string) => {  react-hooks/set-state-in-effect
+
+E:\3m Store\3m_frontend\src\features\auth\AuthModal.tsx
+   55:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  469:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\auth\ResetPasswordView.tsx
+  38:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\checkout\CheckoutView.tsx
+  95:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\checkout\OrderSuccessView.tsx
+  17:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\checkout\OrderSuccessView.tsx:17:7
+  15 |   useEffect(() => {
+  16 |     if (!orderID) {
+> 17 |       setIsLoading(false);
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |       return;
+  19 |     }
+  20 |  react-hooks/set-state-in-effect
+  25:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\checkout\PaymentView.tsx
+   63:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  216:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\favorites\FavoritesView.tsx
+  20:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  68:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\products\ProductDetailsView.tsx
+   51:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  273:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\products\ProductsView.tsx
+   21:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\products\ProductsView.tsx:21:5
+  19 |   
+  20 |   useEffect(() => {
+> 21 |     setSearchTerm(keyword);
+     |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |   }, [keyword]);
+  23 |
+  24 |  react-hooks/set-state-in-effect
+   85:37  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  281:44  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\features\user\ProfileView.tsx
+  27:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+E:\3m Store\3m_frontend\src\features\user\ProfileView.tsx:27:7
+  25 |   useEffect(() => {
+  26 |     if (user) {
+> 27 |       setEditedName(user.name);
+     |       ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  28 |     }
+  29 |   }, [user]);
+  30 |  react-hooks/set-state-in-effect
+  46:19  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  69:19  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+E:\3m Store\3m_frontend\src\services\userService.ts
+   13:5  error  'localUsers' is never reassigned. Use 'const' instead           prefer-const
+   97:7  error  There is no `cause` attached to the symptom error being thrown  preserve-caught-error
+  115:7  error  There is no `cause` attached to the symptom error being thrown  preserve-caught-error
+
+ظ£û 55 problems (55 errors, 0 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
