@@ -1,11 +1,17 @@
 import { RequestHandler } from "express";
 import { Cart } from "../cart-model";
 
-export const updateQuantity: RequestHandler<{ productID: string }, any, { quantity: number }> = async (req, res) => {
+interface IUpdateBody {
+    quantity: number;
+    size?: string;
+    colorCode?: string;
+}
+
+export const updateQuantity: RequestHandler<{ productID: string }, any, IUpdateBody> = async (req, res) => {
     try {
         const userID = req.user!.id;
         const { productID } = req.params;
-        const { quantity } = req.body;
+        const { quantity, size, colorCode } = req.body;
 
         if (!quantity || quantity < 1) {
             return res.status(400).json({ message: "Quantity must be at least 1" });
@@ -16,9 +22,16 @@ export const updateQuantity: RequestHandler<{ productID: string }, any, { quanti
             return res.status(404).json({ message: "Cart not found" });
         }
 
-        const itemIndex = cart.items.findIndex(item => item.productID.toString() === productID);
+        // Match by productID + size + colorCode to target the correct variant
+        const itemIndex = cart.items.findIndex(item => {
+            const idMatch = item.productID.toString() === productID;
+            const sizeMatch = size ? item.size === size : true;
+            const colorMatch = colorCode ? item.colorCode === colorCode : true;
+            return idMatch && sizeMatch && colorMatch;
+        });
+
         if (itemIndex === -1) {
-            return res.status(404).json({ message: "Product not in cart" });
+            return res.status(404).json({ message: "Product variant not found in cart" });
         }
 
         cart.items[itemIndex].quantity = quantity;

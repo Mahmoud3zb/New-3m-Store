@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { IUser } from '../types';
+import type { IUser, Role } from '../types';
 
 export interface UsersResponse {
   message: string;
@@ -76,9 +76,9 @@ export const userService = {
     }
   },
 
-  updateUser: async (id: string, name: string): Promise<{ message: string; data: IUser }> => {
+  updateUser: async (id: string, userData: { name: string; role?: Role; permissions?: string[] }): Promise<{ message: string; data: IUser }> => {
     try {
-      const response = await api.put<{ message: string; data: IUser }>(`/user/${id}`, { name });
+      const response = await api.put<{ message: string; data: IUser }>(`/user/${id}`, userData);
       return response.data;
     } catch (err) {
       console.warn(`API PUT /user/${id} failed, updating local mock users:`, err);
@@ -86,7 +86,9 @@ export const userService = {
       if (userIndex > -1) {
         localUsers[userIndex] = {
           ...localUsers[userIndex],
-          name,
+          name: userData.name,
+          role: userData.role || localUsers[userIndex].role,
+          permissions: userData.permissions || localUsers[userIndex].permissions || [],
           updatedAt: new Date().toISOString()
         };
         return {
@@ -113,6 +115,31 @@ export const userService = {
         };
       }
       throw new Error('User not found in mock storage');
+    }
+  },
+
+  addUser: async (userData: any): Promise<{ message: string; data: IUser }> => {
+    try {
+      const response = await api.post<{ message: string; data: IUser }>('/user/add', userData);
+      return response.data;
+    } catch (err) {
+      console.warn('API POST /user/add failed, saving to local mock users:', err);
+      const newUser: IUser = {
+        _id: 'user-' + (localUsers.length + 1),
+        name: userData.name,
+        email: userData.email,
+        address: userData.address || { street: 'Not Specified', city: 'Cairo', country: 'Egypt' },
+        role: userData.role || 'user',
+        permissions: userData.permissions || [],
+        isVerified: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      localUsers.push(newUser);
+      return {
+        message: 'Mock user added successfully',
+        data: newUser
+      };
     }
   }
 };

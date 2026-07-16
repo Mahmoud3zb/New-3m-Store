@@ -38,7 +38,12 @@ export const googleLogin: RequestHandler = async (req, res) => {
                 name: name || "Google User",
                 email: email,
                 password: randomPassword,
-                role: Role.User 
+                role: Role.User,
+                address: {
+                    street: "Not Specified",
+                    city: "Cairo",
+                    country: "Egypt"
+                }
             });
         }
 

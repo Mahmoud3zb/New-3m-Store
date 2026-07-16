@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { productService } from '../../services/productService';
 import { orderService } from '../../services/orderService';
-import type { IProduct, ICategory } from '../../types';
+import type { IProduct, ICategory, IProductVariant, IProductOffer } from '../../types';
 import type { IOrder } from '../../services/orderService';
 import { Navigate } from 'react-router-dom';
 import { ClipboardList, Package, Tag, Users, BarChart3, Settings } from 'lucide-react';
@@ -26,7 +26,40 @@ export default function AdminDashboardView() {
   const t = translations[language];
   
 
+  const getAllAllowedTabs = (): ('analytics' | 'orders' | 'products' | 'categories' | 'users' | 'promos' | 'settings')[] => {
+    if (!user) return [];
+    
+    // Super Admin is either admin@gmail.com OR someone who has all 4 permissions
+    const isSuper = user.email === 'admin@gmail.com' || (user.permissions && user.permissions.length === 4);
+    
+    if (isSuper) {
+      return ['analytics', 'orders', 'products', 'categories', 'users', 'promos', 'settings'];
+    }
+    
+    const allowed: ('analytics' | 'orders' | 'products' | 'categories' | 'users' | 'promos' | 'settings')[] = [];
+    const perms = user.permissions || [];
+    
+    if (perms.includes('can_view_analytics')) allowed.push('analytics');
+    if (perms.includes('can_view_orders')) allowed.push('orders');
+    if (perms.includes('can_add_products')) {
+      allowed.push('products');
+      allowed.push('categories');
+    }
+    if (perms.includes('can_manage_coupons')) allowed.push('promos');
+    
+    return allowed;
+  };
+
   const [activeTab, setActiveTab] = useState<'analytics' | 'orders' | 'products' | 'categories' | 'users' | 'promos' | 'settings'>('analytics');
+  
+  // Set default allowed tab if current is not allowed
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== 'admin') return;
+    const allowed = getAllAllowedTabs();
+    if (allowed.length > 0 && !allowed.includes(activeTab)) {
+      setActiveTab(allowed[0]);
+    }
+  }, [user, isAuthenticated]);
   
 
   const [orders, setOrders] = useState<IOrder[]>([]);
@@ -96,6 +129,8 @@ export default function AdminDashboardView() {
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'admin') return;
+    const allowed = getAllAllowedTabs();
+    if (!allowed.includes(activeTab)) return; // Don't fetch if tab not allowed yet
     if (activeTab === 'orders') fetchOrders();
     if (activeTab === 'products') {
       fetchProducts();
@@ -129,14 +164,15 @@ export default function AdminDashboardView() {
       name: string;
       description: string;
       price: string;
-      quantity: string;
+      variants: IProductVariant[];
       categoryID: string;
+      offer?: IProductOffer;
       coverFile: File | null;
       galleryFiles: FileList | null;
     }
   ) => {
     e.preventDefault();
-    if (!data.name || !data.description || !data.price || !data.quantity || !data.categoryID) {
+    if (!data.name || !data.description || !data.price || !data.variants || data.variants.length === 0 || !data.categoryID) {
       toast.error(t.adminToastFieldsRequired);
       return;
     }
@@ -145,8 +181,13 @@ export default function AdminDashboardView() {
     formData.append('name', data.name);
     formData.append('description', data.description);
     formData.append('price', data.price);
-    formData.append('quantity', data.quantity);
+    formData.append('variants', JSON.stringify(data.variants));
     formData.append('categoryID', data.categoryID);
+    if (data.offer) {
+      formData.append('offer', JSON.stringify(data.offer));
+    } else {
+      formData.append('offer', '');
+    }
 
     setIsSubmittingProduct(true);
     try {
@@ -262,94 +303,108 @@ export default function AdminDashboardView() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
         
         <div className="lg:col-span-1 space-y-2">
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'analytics'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4" />
-            {t.adminTabAnalytics}
-          </button>
+          {getAllAllowedTabs().includes('analytics') && (
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'analytics'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              {t.adminTabAnalytics}
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'orders'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <ClipboardList className="w-4 h-4" />
-            {t.adminTabOrders}
-            {orders.length > 0 && activeTab !== 'orders' && (
-              <span className={`${language === 'ar' ? 'mr-auto' : 'ml-auto'} bg-neutral-100 text-neutral-800 text-[10px] font-bold px-2 py-0.5 rounded-full font-serif-en`}>
-                {orders.length}
-              </span>
-            )}
-          </button>
+          {getAllAllowedTabs().includes('orders') && (
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'orders'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <ClipboardList className="w-4 h-4" />
+              {t.adminTabOrders}
+              {orders.length > 0 && activeTab !== 'orders' && (
+                <span className={`${language === 'ar' ? 'mr-auto' : 'ml-auto'} bg-neutral-100 text-neutral-800 text-[10px] font-bold px-2 py-0.5 rounded-full font-serif-en`}>
+                  {orders.length}
+                </span>
+              )}
+            </button>
+          )}
           
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'products'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <Package className="w-4 h-4" />
-            {t.adminTabProducts}
-          </button>
+          {getAllAllowedTabs().includes('products') && (
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'products'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              {t.adminTabProducts}
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('categories')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'categories'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <Tag className="w-4 h-4" />
-            {t.adminTabCategories}
-          </button>
+          {getAllAllowedTabs().includes('categories') && (
+            <button
+              onClick={() => setActiveTab('categories')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'categories'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <Tag className="w-4 h-4" />
+              {t.adminTabCategories}
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'users'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            {t.adminTabUsers}
-          </button>
+          {getAllAllowedTabs().includes('users') && (
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'users'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              {t.adminTabUsers}
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('promos')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'promos'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <Tag className="w-4 h-4" />
-            {t.adminTabPromos}
-          </button>
+          {getAllAllowedTabs().includes('promos') && (
+            <button
+              onClick={() => setActiveTab('promos')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'promos'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <Tag className="w-4 h-4" />
+              {t.adminTabPromos}
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
-              activeTab === 'settings'
-                ? 'bg-black text-white border-black shadow-sm'
-                : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
-            }`}
-          >
-            <Settings className="w-4 h-4" />
-            {t.adminTabSettings}
-          </button>
+          {getAllAllowedTabs().includes('settings') && (
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-xs font-bold transition-all border ${
+                activeTab === 'settings'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'bg-white text-neutral-600 border-neutral-100 hover:bg-neutral-50 hover:text-black'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              {t.adminTabSettings}
+            </button>
+          )}
         </div>
 
         <div className="lg:col-span-3">

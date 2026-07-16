@@ -1,20 +1,24 @@
 import mongoose from "mongoose";
 
-
+// Updated item interface to track purchased variant
 interface Iitem {
     productID: mongoose.Types.ObjectId;
+    size: string;       // Size ordered
+    colorCode: string;  // Color code ordered
     quantity: number;
     price: number;
 }
+
 interface IShippingAddress {
     street: string;
     city: string;
     phone: string;
 }
+
 interface IOrder extends mongoose.Document {
     userID: mongoose.Types.ObjectId;
     items: Iitem[];
-    shippingAddress:IShippingAddress
+    shippingAddress: IShippingAddress;
     totalPrice: number;
     status: string;
     paymentMethod: string;
@@ -40,6 +44,14 @@ const orderSchema = new mongoose.Schema<IOrder>({
                     ref: "Product",
                     required: true
                 },
+                size: {
+                    type: String,
+                    required: [true, "Size is required for order items"]
+                },
+                colorCode: {
+                    type: String,
+                    required: [true, "Color code is required for order items"]
+                },
                 quantity: {
                     type: Number,
                     required: true,
@@ -52,7 +64,6 @@ const orderSchema = new mongoose.Schema<IOrder>({
                 }
             }
         ],
-
         validate: {
             validator: function (item: Iitem[]) {
                 return item && item.length > 0;
@@ -94,7 +105,7 @@ const orderSchema = new mongoose.Schema<IOrder>({
         id: { type: String },
         status: { type: String }
     }
-},{
+}, {
     timestamps: true
 });
 

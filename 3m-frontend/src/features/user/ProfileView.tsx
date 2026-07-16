@@ -66,7 +66,7 @@ export function ProfileView() {
     }
     setIsSavingProfile(true);
     try {
-      const res = await userService.updateUser(user._id, editedName);
+      const res = await userService.updateUser(user._id, { name: editedName });
       setUser({ ...user, name: res.data.name });
       setIsEditingProfile(false);
       toast.success(t.profileUpdateSuccess);

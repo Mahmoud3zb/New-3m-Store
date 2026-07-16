@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useCartStore } from '../../store/cartStore';
+import { useCartStore, getProductPrice } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { orderService } from '../../services/orderService';
 import { MapPin, Phone, CreditCard, ShieldCheck, ShoppingBag, ArrowLeft, Loader2, Tag, X } from 'lucide-react';
@@ -117,7 +117,7 @@ export function CheckoutView() {
       'Alexandria', 'Qalyubia', 'Dakahlia', 'Sharqia', 'Monufia', 'Gharbia', 'Damietta', 'Port Said', 'Suez', 'Ismailia'
     ];
 
-    const fees = settings?.shippingFees || { cairoGiza: 50, alexDelta: 65, other: 85 };
+    const fees = settings?.shippingFees || { cairoGiza: 100, alexDelta: 80, other: 60 };
 
     if (cairoGiza.includes(formData.city)) return fees.cairoGiza;
     if (deltaAndCanal.includes(formData.city)) return fees.alexDelta;
@@ -433,12 +433,35 @@ export function CheckoutView() {
                   <div className="flex-grow min-w-0">
                     <h4 className="text-xs font-bold text-neutral-900 truncate">{product.name}</h4>
                     <span className="text-[10px] text-neutral-400 font-serif-en block mt-0.5">
-                      {item.quantity} × {formatPrice(product.price)}
+                      {item.quantity} × {formatPrice(getProductPrice(product))}
                     </span>
                   </div>
-                  <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
-                    {formatPrice(product.price * item.quantity)}
-                  </span>
+                  <div className="text-right">
+                    {product.offer && product.offer.discountedPrice !== undefined && (
+                      (() => {
+                        const now = new Date();
+                        const start = new Date(product.offer.startDate);
+                        const end = new Date(product.offer.endDate);
+                        if (now >= start && now <= end) {
+                          return (
+                            <div className="flex flex-col items-end">
+                              <span className="text-[10px] line-through text-red-500 font-serif-en opacity-70" dir="ltr">
+                                {formatPrice(product.price * item.quantity)}
+                              </span>
+                              <span className="text-xs font-bold text-neutral-900 font-serif-en animate-pulse" dir="ltr">
+                                {formatPrice(product.offer.discountedPrice * item.quantity)}
+                              </span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()
+                    ) || (
+                      <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
+                        {formatPrice(product.price * item.quantity)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             })}

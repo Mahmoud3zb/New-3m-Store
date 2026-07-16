@@ -15,9 +15,10 @@ interface QuickCheckoutModalProps {
   onClose: () => void;
   product: IProduct;
   selectedSize: string;
+  selectedColor: string;
 }
 
-export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: QuickCheckoutModalProps) {
+export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize, selectedColor }: QuickCheckoutModalProps) {
   const navigate = useNavigate();
   const { language } = useLanguageStore();
   const t = translations[language];
@@ -45,7 +46,15 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  
+  // Check if product has an active offer
+  const hasActiveOffer = !!(product.offer && 
+    product.offer.discountedPrice !== undefined && 
+    new Date() < new Date(product.offer.endDate));
+
+  const basePrice = (hasActiveOffer && product.offer && product.offer.discountedPrice !== undefined) 
+    ? product.offer.discountedPrice 
+    : product.price;
+
   useEffect(() => {
     const checkActivePromos = async () => {
       try {
@@ -82,7 +91,6 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
       
       setAppliedPromo(code);
 
-      const basePrice = product.price;
       let discount = 0;
       if (discountType === 'percentage') {
         discount = Math.round(basePrice * (discountValue / 100));
@@ -120,7 +128,7 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
       'Alexandria', 'Qalyubia', 'Dakahlia', 'Sharqia', 'Monufia', 'Gharbia', 'Damietta', 'Port Said', 'Suez', 'Ismailia'
     ];
 
-    const fees = settings?.shippingFees || { cairoGiza: 50, alexDelta: 65, other: 85 };
+    const fees = settings?.shippingFees || { cairoGiza: 100, alexDelta: 80, other: 60 };
 
     if (cairoGiza.includes(formData.city)) return fees.cairoGiza;
     if (deltaAndCanal.includes(formData.city)) return fees.alexDelta;
@@ -160,6 +168,8 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
       const res = await orderService.createDirectOrder(
         product._id,
         1, 
+        selectedSize,
+        selectedColor,
         shippingAddress,
         appliedPromo || undefined
       );
@@ -195,7 +205,7 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
 
   const isRTL = language === 'ar';
   const shippingFee = getShippingFee();
-  const grandTotal = Math.max(0, product.price - discountAmount + shippingFee);
+  const grandTotal = Math.max(0, basePrice - discountAmount + shippingFee);
 
   const citiesList = [
     { ar: 'القاهرة', en: 'Cairo' },
@@ -264,8 +274,13 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
               <h4 className="text-xs font-bold text-neutral-900 truncate">
                 {product.name}
               </h4>
-              <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-2">
+              <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-2 flex-wrap">
                 <span>{isRTL ? `المقاس: ${selectedSize}` : `Size: ${selectedSize}`}</span>
+                <span className="w-1.5 h-1.5 bg-neutral-300 rounded-full" />
+                <span className="flex items-center gap-1">
+                  {isRTL ? 'اللون:' : 'Color:'}
+                  <span className="w-3 h-3 rounded-full border border-neutral-300 inline-block" style={{ backgroundColor: selectedColor }} />
+                </span>
                 <span className="w-1.5 h-1.5 bg-neutral-300 rounded-full" />
                 <span>{isRTL ? 'الكمية: ١' : 'Qty: 1'}</span>
               </p>
@@ -275,7 +290,7 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize }: Q
           <div className="border-t border-neutral-200/60 pt-4 mt-6 space-y-2">
             <div className="flex justify-between text-[11px] text-neutral-500">
               <span>{isRTL ? 'السعر' : 'Price'}</span>
-              <span className="font-bold font-serif-en">{formatPrice(product.price)}</span>
+              <span className="font-bold font-serif-en">{formatPrice(basePrice)}</span>
             </div>
             
             {discountAmount > 0 && (

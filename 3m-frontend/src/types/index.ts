@@ -14,6 +14,7 @@ export interface IUser {
   profileImage?: string;
   isVerified: boolean;
   role: Role;
+  permissions?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +29,18 @@ export interface ICategory {
   updatedAt: string;
 }
 
+export interface IProductVariant {
+  size: string;
+  colorCode: string;
+  quantity: number;
+}
+
+export interface IProductOffer {
+  discountedPrice: number;
+  startDate: string;
+  endDate: string;
+}
+
 export interface IProduct {
   _id: string;
   userID: string | IUser;
@@ -37,7 +50,8 @@ export interface IProduct {
   images: string[];
   imageCover: string;
   price: number;
-  quantity: number;
+  variants: IProductVariant[];
+  offer?: IProductOffer;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,6 +59,8 @@ export interface IProduct {
 export interface ICartItem {
   productID: IProduct;
   quantity: number;
+  size?: string;
+  colorCode?: string;
   _id?: string;
 }
 
@@ -64,6 +80,8 @@ export interface IShippingAddress {
 
 export interface IOrderItem {
   productID: IProduct | string;
+  size: string;
+  colorCode: string;
   quantity: number;
   price: number;
   _id?: string;

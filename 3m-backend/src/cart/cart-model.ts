@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 interface Iitem {
     productID: mongoose.Types.ObjectId;
+    size?: string;
+    colorCode?: string;
     quantity: number;
 }
 interface ICart extends mongoose.Document {
@@ -22,6 +24,12 @@ const cartSchema = new mongoose.Schema<ICart>({
                         type: mongoose.Schema.Types.ObjectId,
                         ref: "Product",
                         required: true
+                    },
+                    size: {
+                        type: String
+                    },
+                    colorCode: {
+                        type: String
                     },
                     quantity: {
                         type: Number,

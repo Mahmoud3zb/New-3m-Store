@@ -12,7 +12,7 @@ export const getCart: RequestHandler<{}, IResponse, {}> = async (req, res) => {
         const userID = req.user!.id;
 
         const cart = await Cart.findOne({ userID })
-            .populate("items.productID", "name price imageCover")
+            .populate("items.productID", "name price imageCover offer")
             .lean();
 
         if (!cart) {
@@ -26,7 +26,16 @@ export const getCart: RequestHandler<{}, IResponse, {}> = async (req, res) => {
 
         cart.items.forEach((item: any) => {
             if (item.productID && item.productID.price) {
-                totalCartPrice += item.productID.price * item.quantity;
+                let itemPrice = item.productID.price;
+                if (item.productID.offer && item.productID.offer.discountedPrice !== undefined) {
+                    const now = new Date();
+                    const start = new Date(item.productID.offer.startDate);
+                    const end = new Date(item.productID.offer.endDate);
+                    if (now >= start && now <= end) {
+                        itemPrice = item.productID.offer.discountedPrice;
+                    }
+                }
+                totalCartPrice += itemPrice * item.quantity;
             }
         });
 

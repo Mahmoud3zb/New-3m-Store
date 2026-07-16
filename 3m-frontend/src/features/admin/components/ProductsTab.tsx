@@ -93,7 +93,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                       </td>
                       <td className="p-4 md:p-5 font-bold text-neutral-800 font-serif-en" dir="ltr">{formatPrice(product.price)}</td>
                       <td className="p-4 md:p-5 font-bold text-neutral-500 font-serif-en">
-                        {product.quantity} {t.adminProductPiece}
+                        {(product.variants || []).reduce((sum, v) => sum + v.quantity, 0)} {t.adminProductPiece}
                       </td>
                       <td className="p-4 md:p-5">
                         <div className="flex items-center justify-center gap-2">

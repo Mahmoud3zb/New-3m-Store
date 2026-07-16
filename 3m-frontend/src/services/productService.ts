@@ -51,7 +51,9 @@ const mockProducts: IProduct[] = [
     images: ['/p1.jpeg', '/p2.jpeg', '/p3.jpeg'],
     imageCover: '/p1.jpeg',
     price: 1200,
-    quantity: 10,
+    variants: [
+      { size: 'M', colorCode: '#000000', quantity: 10 }
+    ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -64,7 +66,9 @@ const mockProducts: IProduct[] = [
     images: ['/p2.jpeg'],
     imageCover: '/p2.jpeg',
     price: 950,
-    quantity: 15,
+    variants: [
+      { size: 'M', colorCode: '#000000', quantity: 15 }
+    ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -77,7 +81,9 @@ const mockProducts: IProduct[] = [
     images: ['/p3.jpeg'],
     imageCover: '/p3.jpeg',
     price: 800,
-    quantity: 8,
+    variants: [
+      { size: 'M', colorCode: '#000000', quantity: 8 }
+    ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -90,7 +96,9 @@ const mockProducts: IProduct[] = [
     images: ['/p4.jpeg'],
     imageCover: '/p4.jpeg',
     price: 650,
-    quantity: 20,
+    variants: [
+      { size: 'M', colorCode: '#000000', quantity: 20 }
+    ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

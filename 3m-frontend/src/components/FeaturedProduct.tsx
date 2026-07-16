@@ -114,9 +114,32 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = () => {
               {activeProduct.name}
             </h2>
           </Link>
-          <p className="font-serif-en text-2xl mb-8 text-neutral-900 font-bold" dir="ltr">
-            {activeProduct.price} {t.currency}
-          </p>
+          <div className="mb-8 flex items-baseline gap-2.5">
+            {activeProduct.offer && activeProduct.offer.discountedPrice !== undefined && (
+              (() => {
+                const now = new Date();
+                const start = new Date(activeProduct.offer.startDate);
+                const end = new Date(activeProduct.offer.endDate);
+                if (now >= start && now <= end) {
+                  return (
+                    <>
+                      <span className="text-sm line-through text-red-500 font-serif-en opacity-70" dir="ltr">
+                        {activeProduct.price} {t.currency}
+                      </span>
+                      <span className="font-serif-en text-2xl text-neutral-900 font-bold" dir="ltr">
+                        {activeProduct.offer.discountedPrice} {t.currency}
+                      </span>
+                    </>
+                  );
+                }
+                return null;
+              })()
+            ) || (
+              <span className="font-serif-en text-2xl text-neutral-900 font-bold" dir="ltr">
+                {activeProduct.price} {t.currency}
+              </span>
+            )}
+          </div>
 
           <p className="text-neutral-500 leading-relaxed mb-10 text-xs font-medium">
             {activeProduct.description}

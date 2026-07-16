@@ -22,6 +22,8 @@ export const addToCartValidator = [
 interface IRequest {
     productID: string;
     quantity: number;
+    size?: string;
+    colorCode?: string;
 }
 
 interface IResponse {
@@ -33,30 +35,44 @@ export const addToCart: RequestHandler<{}, IResponse, IRequest> = async (req,res
     try {
         const userID = req.user?.id;
 
-        const { productID, quantity } = req.body;
+        const { productID, quantity, size, colorCode } = req.body;
 
         const product = await Product.findById(productID);
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
-        if (quantity > product.quantity) {
-            return res.status(400).json({ 
-                message: `Only ${product.quantity} items available in stock` 
-            });
-        }
 
+        // Validate variant stock if size/color are provided
+        if (size && colorCode) {
+            const variant = product.variants.find(
+                (v) => v.size === size && v.colorCode === colorCode
+            );
+            if (!variant) {
+                return res.status(400).json({ 
+                    message: `Variant (Size: ${size}, Color: ${colorCode}) is not available` 
+                });
+            }
+            if (quantity > variant.quantity) {
+                return res.status(400).json({ 
+                    message: `Only ${variant.quantity} items available for this variant` 
+                });
+            }
+        }
 
         let cart = await Cart.findOne({ userID });
 
         if (!cart) {
             cart = await Cart.create({
                 userID,
-                items: [{ productID, quantity }],
+                items: [{ productID, quantity, size, colorCode }],
             });
         } else {
             const itemIndex = cart.items.findIndex(
-                (item) => item.productID.toString() === productID,
+                (item) => 
+                    item.productID.toString() === productID && 
+                    item.size === size && 
+                    item.colorCode === colorCode
             );
 
             if (itemIndex > -1) {
@@ -64,6 +80,8 @@ export const addToCart: RequestHandler<{}, IResponse, IRequest> = async (req,res
             } else {
                 cart.items.push({
                     productID: new mongoose.Types.ObjectId(productID),
+                    size,
+                    colorCode,
                     quantity,
                 });
             }

@@ -78,8 +78,8 @@ export const orderService = {
     return response.data;
   },
 
-  createDirectOrder: async (productID: string, quantity: number, shippingAddress: IShippingAddress, promoCode?: string): Promise<CreateOrderResponse> => {
-    const response = await api.post<CreateOrderResponse>('/order/direct', { productID, quantity, shippingAddress, promoCode });
+  createDirectOrder: async (productID: string, quantity: number, size: string, colorCode: string, shippingAddress: IShippingAddress, promoCode?: string): Promise<CreateOrderResponse> => {
+    const response = await api.post<CreateOrderResponse>('/order/direct', { productID, quantity, size, colorCode, shippingAddress, promoCode });
     return response.data;
   },
 

@@ -14,9 +14,8 @@ export const productValidator = [
     body("price")
         .notEmpty().withMessage("Price is required")
         .isFloat({ min: 1 }).withMessage("Price must be at least 1"),
-    body("quantity")
-        .notEmpty().withMessage("Quantity is required")
-        .isInt({ min: 0 }).withMessage("Quantity must be a number"),
+    body("variants")
+        .notEmpty().withMessage("Variants are required"),
     body("categoryID")
         .notEmpty().withMessage("Category ID is required")
         .isMongoId().withMessage("Invalid Category ID format"),

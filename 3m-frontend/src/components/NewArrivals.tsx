@@ -111,9 +111,32 @@ export const NewArrivals: React.FC = () => {
               <div className="mt-auto pt-2 border-t border-neutral-50">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-[10px] text-neutral-400">{t.priceLabel}</span>
-                  <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
-                    {product.price} {t.currency}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {product.offer && product.offer.discountedPrice !== undefined && (
+                      (() => {
+                        const now = new Date();
+                        const start = new Date(product.offer.startDate);
+                        const end = new Date(product.offer.endDate);
+                        if (now >= start && now <= end) {
+                          return (
+                            <>
+                              <span className="text-[10px] line-through text-red-500 font-serif-en opacity-70" dir="ltr">
+                                {product.price} {t.currency}
+                              </span>
+                              <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
+                                {product.offer.discountedPrice} {t.currency}
+                              </span>
+                            </>
+                          );
+                        }
+                        return null;
+                      })()
+                    ) || (
+                      <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
+                        {product.price} {t.currency}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={() => addItem(product)}

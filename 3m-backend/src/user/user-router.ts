@@ -10,6 +10,8 @@ import { updateProfileImage } from "./user-controllers/update-profile-image";
 import { isAuthenticated } from "../middlewares/isAuthenticated.middleware";
 import { getWishlist, addToWishlist, removeFromWishlist } from "./user-controllers/wishlist-controllers";
 import { upload } from "../middlewares/upload.middleware";
+import { isAuthorized } from "../middlewares/isAuthorized.middleware";
+import { Role } from "./user-model";
 
 const router = Router();
 
@@ -20,10 +22,10 @@ router.delete('/wishlist/:productID', isAuthenticated, removeFromWishlist);
 
 router.put('/profile/image', isAuthenticated, upload.single('profileImage'), updateProfileImage);
 
-router.get('/',getAllUsers);
-router.get('/:id',getUserById);
-router.post('/add',createUserValidator,handleValidationErrors,addUser);
-router.put('/:id',updateUserNameValidation,handleValidationErrors,updateUserNameById);
-router.delete('/:id',deleteUserById);
+router.get('/', isAuthenticated, isAuthorized(Role.Admin), getAllUsers);
+router.get('/:id', isAuthenticated, isAuthorized(Role.Admin), getUserById);
+router.post('/add', isAuthenticated, isAuthorized(Role.Admin), createUserValidator, handleValidationErrors, addUser);
+router.put('/:id', isAuthenticated, updateUserNameValidation, handleValidationErrors, updateUserNameById);
+router.delete('/:id', isAuthenticated, isAuthorized(Role.Admin), deleteUserById);
 
 export default router;

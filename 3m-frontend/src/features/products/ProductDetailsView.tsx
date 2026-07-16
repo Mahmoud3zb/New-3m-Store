@@ -22,7 +22,8 @@ export function ProductDetailsView() {
   const { language } = useLanguageStore();
   const t = translations[language];
 
-  const [selectedSize, setSelectedSize] = useState<string>('S');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
   const [activeImage, setActiveImage] = useState<string>('');
   const [rating, setRating] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
@@ -30,8 +31,6 @@ export function ProductDetailsView() {
   const [reviewSuccess, setReviewSuccess] = useState<string>('');
   const [showSizeGuide, setShowSizeGuide] = useState<boolean>(false);
   const [isQuickCheckoutOpen, setIsQuickCheckoutOpen] = useState<boolean>(false);
-
-  const sizes = ['XS', 'S', 'M', 'L', 'XL'];
 
   
   const { data: productData, isLoading: isLoadingProduct, error: productError } = useQuery({
@@ -77,6 +76,13 @@ export function ProductDetailsView() {
   useEffect(() => {
     if (product) {
       setActiveImage(product.imageCover);
+      if (product.variants && product.variants.length > 0) {
+        const firstAvailableVariant = product.variants.find((v: any) => v.quantity > 0) || product.variants[0];
+        if (firstAvailableVariant) {
+          setSelectedSize(firstAvailableVariant.size);
+          setSelectedColor(firstAvailableVariant.colorCode);
+        }
+      }
     }
   }, [product]);
 
@@ -117,7 +123,7 @@ export function ProductDetailsView() {
 
   const handleAddToCart = () => {
     if (product) {
-      addItem(product);
+      addItem(product, 1, selectedSize, selectedColor);
     }
   };
 
@@ -243,19 +249,50 @@ export function ProductDetailsView() {
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="text-2xl font-serif-en font-black text-neutral-950 pt-2" dir="ltr">
-                {product.price} {t.currency}
+              <div className="text-2xl font-serif-en font-black text-neutral-950 pt-2 flex items-center gap-2" dir="ltr">
+                {product.offer && product.offer.discountedPrice !== undefined && (
+                  (() => {
+                    const now = new Date();
+                    const start = new Date(product.offer.startDate);
+                    const end = new Date(product.offer.endDate);
+                    if (now >= start && now <= end) {
+                      return (
+                        <>
+                          <span className="text-sm line-through text-red-500 font-serif-en opacity-70">
+                            {product.price} {t.currency}
+                          </span>
+                          <span>
+                            {product.offer.discountedPrice} {t.currency}
+                          </span>
+                        </>
+                      );
+                    }
+                    return null;
+                  })()
+                ) || (
+                  <span>
+                    {product.price} {t.currency}
+                  </span>
+                )}
               </div>
               
-              {product.quantity === 0 ? (
-                <span className="inline-flex items-center gap-1 bg-red-50 text-red-650 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-red-100 uppercase tracking-wider animate-pulse mt-2">
-                  {t.outOfStock}
-                </span>
-              ) : product.quantity <= 5 ? (
-                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-650 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-amber-100 uppercase tracking-wider mt-2">
-                  {t.onlyItemsLeft.replace('{count}', String(product.quantity))}
-                </span>
-              ) : null}
+              {(() => {
+                const totalQuantity = product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0;
+                if (totalQuantity === 0) {
+                  return (
+                    <span className="inline-flex items-center gap-1 bg-red-50 text-red-650 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-red-100 uppercase tracking-wider animate-pulse mt-2">
+                      {t.outOfStock}
+                    </span>
+                  );
+                } else if (totalQuantity <= 5) {
+                  return (
+                    <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-650 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-amber-100 uppercase tracking-wider mt-2">
+                      {t.onlyItemsLeft.replace('{count}', String(totalQuantity))}
+                    </span>
+                  );
+                }
+                return null;
+              })()}
             </div>
           </div>
 
@@ -278,18 +315,26 @@ export function ProductDetailsView() {
               </button>
             </div>
             <div className={`flex gap-2.5 font-serif-en text-xs ${language === 'ar' ? 'justify-end' : 'justify-start'}`} dir="ltr">
-              {sizes.map((size) => {
+              {(Array.from(new Set(product.variants?.map((v) => v.size) || []))).map((size) => {
                 const isActive = selectedSize === size;
+                const totalQuantity = product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0;
                 return (
                   <button
                     key={size}
-                    onClick={() => setSelectedSize(size)}
-                    disabled={product.quantity === 0}
+                    onClick={() => {
+                      setSelectedSize(size);
+                      const firstColorForSize = product.variants.find((v: any) => v.size === size && v.quantity > 0)?.colorCode 
+                        || product.variants.find((v: any) => v.size === size)?.colorCode;
+                      if (firstColorForSize) {
+                        setSelectedColor(firstColorForSize);
+                      }
+                    }}
+                    disabled={totalQuantity === 0}
                     className={`w-11 h-11 border flex justify-center items-center rounded-xl transition-all cursor-pointer ${
                       isActive
                         ? 'border-neutral-950 bg-neutral-950 text-white shadow-sm'
                         : 'border-neutral-200 text-neutral-800 hover:border-black'
-                    } ${product.quantity === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    } ${totalQuantity === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >
                     {size}
                   </button>
@@ -298,33 +343,92 @@ export function ProductDetailsView() {
             </div>
           </div>
 
+          {/* Color Selection */}
+          <div className="space-y-3">
+            <span className="text-xs font-bold text-neutral-800 block">
+              {language === 'ar' ? 'اختر اللون' : 'Select Color'}
+            </span>
+            <div className={`flex gap-3 items-center flex-wrap ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
+              {(product.variants || [])
+                .filter((v) => v.size === selectedSize)
+                .map((v) => {
+                  const isActive = selectedColor === v.colorCode;
+                  const isOutOfStock = v.quantity === 0;
+                  return (
+                    <button
+                      key={v.colorCode}
+                      onClick={() => !isOutOfStock && setSelectedColor(v.colorCode)}
+                      disabled={isOutOfStock}
+                      style={{ backgroundColor: v.colorCode }}
+                      className={`w-8 h-8 rounded-full border transition-all cursor-pointer relative flex items-center justify-center ${
+                        isActive 
+                          ? 'ring-2 ring-neutral-950 ring-offset-2 scale-110 shadow-sm' 
+                          : 'border-neutral-200 hover:scale-105'
+                      } ${isOutOfStock ? 'opacity-30 cursor-not-allowed' : ''}`}
+                      title={v.colorCode}
+                    >
+                      {isActive && (
+                        <span 
+                          className="w-2.5 h-2.5 rounded-full" 
+                          style={{ 
+                            backgroundColor: ['#ffffff', '#fff'].includes(v.colorCode.toLowerCase()) ? '#000000' : '#ffffff' 
+                          }} 
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+            </div>
+            {(() => {
+              const selectedVariant = product.variants?.find((v) => v.size === selectedSize && v.colorCode === selectedColor);
+              if (selectedVariant) {
+                if (selectedVariant.quantity === 0) {
+                  return (
+                    <span className="text-[11px] text-red-500 font-bold block mt-2">
+                      {language === 'ar' ? '⚠️ نفدت الكمية لهذا اللون والمقاس!' : '⚠️ Out of stock for this size & color!'}
+                    </span>
+                  );
+                } else {
+                  return (
+                    <span className="text-[11px] text-neutral-400 font-bold block mt-2">
+                      {language === 'ar' 
+                        ? `📦 الكمية المتوفرة: ${selectedVariant.quantity} قطعة` 
+                        : `📦 Available stock: ${selectedVariant.quantity} items`}
+                    </span>
+                  );
+                }
+              }
+              return null;
+            })()}
+          </div>
+
        
           <div className="space-y-4 border-t border-neutral-100 pt-8">
             <button
               onClick={handleBuyNow}
-              disabled={product.quantity === 0}
+              disabled={(product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0) === 0}
               className={`w-full text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
-                product.quantity === 0
+                (product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0) === 0
                   ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed border border-neutral-100'
                   : 'bg-black hover:bg-black text-white'
               }`}
             >
               <ShieldCheck className="w-4.5 h-4.5" />
-              {product.quantity === 0 ? t.outOfStock : (language === 'ar' ? 'شراء الآن (الدفع عند الاستلام)' : 'Buy Now (Cash on Delivery)')}
+              {(product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0) === 0 ? t.outOfStock : (language === 'ar' ? 'شراء الآن (الدفع عند الاستلام)' : 'Buy Now (Cash on Delivery)')}
             </button>
 
             <div className="flex gap-4">
               <button
                 onClick={handleAddToCart}
-                disabled={product.quantity === 0}
+                disabled={(product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0) === 0}
                 className={`flex-1 text-xs font-bold uppercase tracking-wider py-4 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
-                  product.quantity === 0
+                  (product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0) === 0
                     ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed border border-neutral-100'
                     : 'bg-neutral-950 hover:bg-black text-white'
                 }`}
               >
                 <ShoppingBag className="w-4 h-4" />
-                {product.quantity === 0 ? t.outOfStock : t.addToShoppingBag}
+                {(product.variants?.reduce((sum, v) => sum + v.quantity, 0) ?? 0) === 0 ? t.outOfStock : t.addToShoppingBag}
               </button>
               
               <button
@@ -607,7 +711,7 @@ export function ProductDetailsView() {
                     alt={p.name} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  {p.quantity === 0 && (
+                  {((p.variants || []).reduce((sum, v) => sum + v.quantity, 0) === 0) && (
                     <span className="absolute top-2.5 right-2.5 bg-red-50 text-red-650 text-[8px] font-extrabold px-2 py-0.5 rounded-full border border-red-100">
                       {t.outOfStock}
                     </span>
@@ -632,6 +736,7 @@ export function ProductDetailsView() {
         onClose={() => setIsQuickCheckoutOpen(false)}
         product={product}
         selectedSize={selectedSize}
+        selectedColor={selectedColor}
       />
     </div>
   );

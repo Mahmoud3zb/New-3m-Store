@@ -157,7 +157,7 @@ export function CartDrawer() {
               if (!product) return null;
               return (
                 <div 
-                  key={product._id} 
+                  key={`${product._id}-${item.size || ''}-${item.colorCode || ''}`} 
                   className="flex gap-4 p-3 bg-neutral-50/50 hover:bg-neutral-50 border border-neutral-100 rounded-2xl transition-all"
                 >
                   
@@ -175,9 +175,32 @@ export function CartDrawer() {
                       <h4 className="text-xs font-bold text-neutral-900 truncate">
                         {product.name}
                       </h4>
-                      <p className="text-[10px] font-serif-en text-neutral-400 mt-0.5">
-                        {formatPrice(product.price)}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        {product.offer && product.offer.discountedPrice !== undefined && (
+                          (() => {
+                            const now = new Date();
+                            const start = new Date(product.offer.startDate);
+                            const end = new Date(product.offer.endDate);
+                            if (now >= start && now <= end) {
+                              return (
+                                <>
+                                  <span className="text-[9px] line-through text-red-500 font-serif-en opacity-70" dir="ltr">
+                                    {formatPrice(product.price)}
+                                  </span>
+                                  <span className="text-[10px] font-serif-en text-neutral-900 font-bold" dir="ltr">
+                                    {formatPrice(product.offer.discountedPrice)}
+                                  </span>
+                                </>
+                              );
+                            }
+                            return null;
+                          })()
+                        ) || (
+                          <span className="text-[10px] font-serif-en text-neutral-400" dir="ltr">
+                            {formatPrice(product.price)}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex justify-between items-center mt-2">
@@ -185,7 +208,7 @@ export function CartDrawer() {
                       <div className="flex items-center border border-neutral-200 rounded-lg bg-white overflow-hidden">
                         <button
                           type="button"
-                          onClick={() => updateItemQuantity(product._id, item.quantity - 1)}
+                          onClick={() => updateItemQuantity(product._id, item.quantity - 1, item.size, item.colorCode)}
                           className="p-1 hover:bg-neutral-50 text-neutral-500 hover:text-black transition-colors cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
@@ -195,7 +218,7 @@ export function CartDrawer() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => updateItemQuantity(product._id, item.quantity + 1)}
+                          onClick={() => updateItemQuantity(product._id, item.quantity + 1, item.size, item.colorCode)}
                           className="p-1 hover:bg-neutral-50 text-neutral-500 hover:text-black transition-colors cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
@@ -204,7 +227,7 @@ export function CartDrawer() {
 
                       
                       <button
-                        onClick={() => removeItem(product._id)}
+                        onClick={() => removeItem(product._id, item.size, item.colorCode)}
                         className="text-neutral-400 hover:text-red-600 p-1 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
                         title={language === 'ar' ? 'حذف من السلة' : 'Remove from cart'}
                       >

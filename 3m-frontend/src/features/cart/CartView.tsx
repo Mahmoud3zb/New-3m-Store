@@ -161,9 +161,32 @@ export function CartView() {
                      
                       <div className={language === 'ar' ? 'text-left' : 'text-right'}>
                         <span className="text-[10px] text-neutral-400 block mb-0.5">{t.itemTotalLabel}</span>
-                        <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
-                          {formatPrice(product.price * item.quantity)}
-                        </span>
+                        <div className="flex items-center gap-1.5 justify-end">
+                          {product.offer && product.offer.discountedPrice !== undefined && (
+                            (() => {
+                              const now = new Date();
+                              const start = new Date(product.offer.startDate);
+                              const end = new Date(product.offer.endDate);
+                              if (now >= start && now <= end) {
+                                return (
+                                  <>
+                                    <span className="text-[10px] line-through text-red-500 font-serif-en opacity-70" dir="ltr">
+                                      {formatPrice(product.price * item.quantity)}
+                                    </span>
+                                    <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
+                                      {formatPrice(product.offer.discountedPrice * item.quantity)}
+                                    </span>
+                                  </>
+                                );
+                              }
+                              return null;
+                            })()
+                          ) || (
+                            <span className="text-xs font-bold text-neutral-900 font-serif-en" dir="ltr">
+                              {formatPrice(product.price * item.quantity)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
