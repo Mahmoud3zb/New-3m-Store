@@ -11,6 +11,7 @@ import { ProductImageGallery } from './components/ProductImageGallery';
 import { ProductInfo } from './components/ProductInfo';
 import { ProductReviews } from './components/ProductReviews';
 import { RelatedProducts } from './components/RelatedProducts';
+import { SEO } from '../../components/SEO';
 
 export function ProductDetailsView() {
   const { id } = useParams<{ id: string }>();
@@ -80,6 +81,11 @@ export function ProductDetailsView() {
 
   return (
     <div className={`pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto ${language === 'ar' ? 'text-right' : 'text-left'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <SEO 
+        title={product.name} 
+        description={product.description || 'Premium product from 3M Store'} 
+        image={product.imageCover} 
+      />
       
       <div className="mb-8">
         <Link to="/shop" className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-black transition-colors font-medium">

@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { Order } from "../order-model";
+import { sendOrderStatusUpdate } from "../../services/notification-service";
 
 interface IRequest {
     status: string;
@@ -33,6 +34,17 @@ export const updateOrderStatus: RequestHandler<{ id: string }, IResponse, IReque
         if (!updatedOrder) {
             return res.status(404).json({ message: "Order not found" });
         }
+
+        // Send status update notification to customer
+        const userLanguage = req.headers["accept-language"]?.includes("en") ? "en" : "ar";
+        sendOrderStatusUpdate(
+            updatedOrder.shippingAddress.phone,
+            updatedOrder._id.toString(),
+            status,
+            userLanguage
+        ).catch((err) => {
+            console.error("Notification Error:", err);
+        });
 
         return res.status(200).json({
             message: "Order status updated successfully",

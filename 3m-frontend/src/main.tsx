@@ -85,15 +85,19 @@ const router = createBrowserRouter([
   },
 ])
 
+import { HelmetProvider } from 'react-helmet-async'
+
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={googleClientId} locale="ar">
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </GoogleOAuthProvider>
+    <HelmetProvider>
+      <GoogleOAuthProvider clientId={googleClientId} locale="ar">
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </GoogleOAuthProvider>
+    </HelmetProvider>
   </StrictMode>,
 )
 

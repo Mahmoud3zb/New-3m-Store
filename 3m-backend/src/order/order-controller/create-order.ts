@@ -5,6 +5,7 @@ import { Cart } from "../../cart/cart-model";
 import { Product } from "../../product/product-model";
 import { Promo } from "../../promo/promo-model";
 import { body } from "express-validator";
+import { sendOrderConfirmation } from "../../services/notification-service";
 
 export const validator = [
     body("shippingAddress.street")
@@ -191,6 +192,12 @@ export const createOrder: RequestHandler<{}, IResponse, IRequest> = async (req, 
             { path: "userID", select: "name email" },
             { path: "items.productID", select: "name imageCover" }
         ]);
+
+        // Send order confirmation alert to customer
+        const userLanguage = req.headers["accept-language"]?.includes("en") ? "en" : "ar";
+        sendOrderConfirmation(shippingAddress.phone, newOrder._id.toString(), finalTotal, userLanguage).catch((err) => {
+            console.error("Notification Error:", err);
+        });
 
         return res.status(201).json({
             message: "Order created successfully",
