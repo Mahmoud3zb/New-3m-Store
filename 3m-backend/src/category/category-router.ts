@@ -13,7 +13,7 @@ import { Role } from "../user/user-model";
 const router = Router();
 
 router.get('/', getAllCategories);
-router.get('/:id', isAuthenticated, isAuthorized(Role.Admin), getCategoryById);
+router.get('/:id', getCategoryById);
 
 router.post('/add', 
     isAuthenticated, 
