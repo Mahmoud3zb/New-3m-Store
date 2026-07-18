@@ -29,6 +29,10 @@ A premium, full-stack boutique e-commerce solution built with a decoupled monore
 * **Click-Outside Dismissal:** Features document event listeners that safely close suggestions when users click away.
 * **Full-Screen Mobile Overlay:** Redesigned center mobile FAB button with a cutout effect that opens a full-screen search deck with live suggestions.
 
+### 5. 📈 Dynamic SEO & Social Sharing
+* **Dynamic Document Headers**: Powered by `react-helmet-async` to dynamically inject and update OpenGraph and Meta tags for specific pages.
+* **Structured Preview Cards**: Allows sharing product links directly to WhatsApp, Facebook, or Twitter with interactive previews displaying product cover image, price, and descriptive meta descriptions.
+
 ---
 
 ## 📂 Repository Structure
@@ -37,7 +41,7 @@ The project is organized into two main workspaces:
 
 ```bash
 3m-store/
-├── 3m_backend/          # Node.js + Express + TypeScript Backend
+├── 3m-backend/          # Node.js + Express + TypeScript Backend
 │   ├── src/
 │   │   ├── auth/        # Authentication routes & controllers (Local & Google OAuth)
 │   │   ├── cart/        # Cart management
@@ -48,10 +52,10 @@ The project is organized into two main workspaces:
 │   │   ├── product/     # Product inventory management
 │   │   ├── review/      # Product reviews & ratings
 │   │   └── user/        # User profile & wishlist management
-│   ├── app.ts           # Server entry point
+│   ├── index.ts         # Server entry point
 │   ├── tsconfig.json    # TypeScript configurations
 │   └── package.json     # Node dependencies & scripts
-└── 3m_frontend/         # Vite-powered Frontend Application
+└── 3m-frontend/         # Vite-powered Frontend Application
     ├── src/
     │   ├── components/  # Core shared layouts (Navbar, Footer, MobileNav)
     │   ├── features/    # Feature-based views (Cart, Checkout, Products, Auth)
@@ -66,8 +70,8 @@ The project is organized into two main workspaces:
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React, Vite, Tailwind CSS, Zustand, React Query (TanStack), Axios, Lucide Icons, React Hot Toast |
-| **Backend** | Node.js, Express.js (v5), TypeScript, MongoDB via Mongoose, Multer + Cloudinary |
+| **Frontend** | React, Vite, Tailwind CSS, Zustand, React Query (TanStack), Axios, Lucide Icons, React Hot Toast, React Helmet Async |
+| **Backend** | Node.js, Express.js (v5), TypeScript, MongoDB via Mongoose, Multer + Cloudinary, Winston Logger, Express Rate Limit |
 | **Services & API** | Stripe Payments, Google OAuth, Nodemailer (Gmail SMTP), Vercel |
 
 ---
@@ -85,7 +89,7 @@ The project is organized into two main workspaces:
 
 1. **Navigate to the backend directory**:
    ```bash
-   cd 3m_backend
+   cd 3m-backend
    ```
 
 2. **Install dependencies**:
@@ -94,7 +98,7 @@ The project is organized into two main workspaces:
    ```
 
 3. **Configure environment variables**:
-   Create a `.env` file in the root of `3m_backend/`:
+   Create a `.env` file in the root of `3m-backend/`:
    ```env
    PORT=3000
    DB_URL=mongodb://localhost:27017
@@ -132,7 +136,7 @@ The project is organized into two main workspaces:
 
 1. **Navigate to the frontend directory**:
    ```bash
-   cd 3m_frontend
+   cd 3m-frontend
    ```
 
 2. **Install dependencies**:
@@ -141,7 +145,7 @@ The project is organized into two main workspaces:
    ```
 
 3. **Configure environment variables**:
-   Create a `.env` file in the root of `3m_frontend/`:
+   Create a `.env` file in the root of `3m-frontend/`:
    ```env
    VITE_API_URL=http://localhost:3000/api
    ```
@@ -154,8 +158,11 @@ The project is organized into two main workspaces:
 
 ---
 
-## 🔒 Security & Middleware Features
+## 🔒 Security, Reliability & Middleware Features
 
+* **Double-Tiered API Rate Limiting**: Features endpoint limiters via `express-rate-limit` allowing 200 requests/15 mins on general routes, and a strict 20 requests/15 mins limit on authentication & coupon routes to block brute-force.
+* **ACID Transactions**: MongoDB sessions protect e-commerce checkouts by dynamically managing size and color inventory modifications in a transactional bubble, reverting stock mutations if any step fails.
+* **Enterprise Log Auditing**: Implements `winston` logging streaming runtime activity to `logs/combined.log` and unexpected exceptions to `logs/error.log`.
 * **Secure Auth State:** Credentials and sessions are authorized via secure `httpOnly` cookies using JSON Web Tokens (JWT).
 * **Cryptographic Signatures:** Stripe webhook responses are cryptographically verified to block mock payment requests.
 * **Auto-upload Pipelines:** Multipart uploads are sent directly to Cloudinary storage via custom `multer-storage-cloudinary` configs.
