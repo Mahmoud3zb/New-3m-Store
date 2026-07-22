@@ -90,7 +90,7 @@ export function OrderSummary({ shippingFee, hasCitySelected }: OrderSummaryProps
           if (!product) return null;
 
           return (
-            <div key={product._id} className="flex gap-4 items-center">
+            <div key={`${product._id}-${item.size || ''}-${item.colorCode || ''}`} className="flex gap-4 items-center">
               <div className="w-12 h-16 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-100">
                 <img 
                   src={product.imageCover || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'} 
@@ -100,6 +100,14 @@ export function OrderSummary({ shippingFee, hasCitySelected }: OrderSummaryProps
               </div>
               <div className="flex-grow min-w-0">
                 <h4 className="text-xs font-bold text-neutral-900 truncate">{product.name}</h4>
+                <p className="text-[9px] text-neutral-500 mt-0.5 flex items-center gap-1.5 font-medium">
+                  <span>{language === 'ar' ? `المقاس: ${item.size}` : `Size: ${item.size}`}</span>
+                  <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                  <span className="flex items-center gap-1">
+                    {language === 'ar' ? 'اللون:' : 'Color:'}
+                    <span className="w-2 h-2 rounded-full border border-neutral-300 inline-block" style={{ backgroundColor: item.colorCode }} />
+                  </span>
+                </p>
                 <span className="text-[10px] text-neutral-400 font-serif-en block mt-0.5">
                   {item.quantity} × {formatPrice(getProductPrice(product))}
                 </span>

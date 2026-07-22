@@ -141,13 +141,13 @@ export function FavoritesView() {
                   </div>
 
                
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-neutral-900 hover:bg-black text-white text-[10px] font-bold tracking-wider py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                  <Link
+                    to={`/product/${product._id}`}
+                    className="w-full bg-neutral-900 hover:bg-black text-white text-[10px] font-bold tracking-wider py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm text-center"
                   >
                     <ShoppingBag className="w-3 h-3" />
-                    {t.addToCartBtn}
-                  </button>
+                    {language === 'ar' ? 'اختر المقاس واللون' : 'Select Size & Color'}
+                  </Link>
                 </div>
               </div>
             );

@@ -190,12 +190,12 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = () => {
 
           
           <div className="flex gap-4 border-t border-gray-200 pt-8">
-            <button
-              onClick={handleAddToCart}
-              className="flex-1 bg-neutral-950 text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors cursor-pointer rounded-xl"
+            <Link
+              to={`/product/${activeProduct._id}`}
+              className="flex-1 bg-neutral-950 text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors cursor-pointer rounded-xl text-center block"
             >
-              {t.addToCart}
-            </button>
+              {language === 'ar' ? 'اختر المقاس واللون' : 'Select Size & Color'}
+            </Link>
             <button
               onClick={() => toggleWishlist(activeProduct)}
               className={`w-14 h-14 border flex justify-center items-center transition-colors cursor-pointer rounded-xl ${

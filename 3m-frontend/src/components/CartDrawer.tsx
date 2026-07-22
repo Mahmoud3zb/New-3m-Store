@@ -175,7 +175,15 @@ export function CartDrawer() {
                       <h4 className="text-xs font-bold text-neutral-900 truncate">
                         {product.name}
                       </h4>
-                      <div className="flex items-center gap-1.5 mt-0.5">
+                      <p className="text-[10px] text-neutral-500 mt-1 flex items-center gap-1.5 font-medium">
+                        <span>{language === 'ar' ? `المقاس: ${item.size}` : `Size: ${item.size}`}</span>
+                        <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                        <span className="flex items-center gap-1">
+                          {language === 'ar' ? 'اللون:' : 'Color:'}
+                          <span className="w-2.5 h-2.5 rounded-full border border-neutral-300 inline-block" style={{ backgroundColor: item.colorCode }} />
+                        </span>
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1.5">
                         {product.offer && product.offer.discountedPrice !== undefined && (
                           (() => {
                             const now = new Date();
