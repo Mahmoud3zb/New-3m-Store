@@ -273,7 +273,7 @@ export function UsersTab() {
 
       {/* Add/Edit User Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className="flex justify-between items-center p-5 border-b border-neutral-100">
               <h3 className="text-sm font-bold text-neutral-800">

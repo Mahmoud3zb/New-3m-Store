@@ -467,6 +467,7 @@ export default function AdminDashboardView() {
         isSubmitting={isSubmittingProduct}
         editingProduct={editingProduct}
         categories={categories}
+        refreshCategories={fetchCategories}
       />
 
       <CategoryModal

@@ -78,7 +78,7 @@ export const MobileSearchOverlay: React.FC<MobileSearchOverlayProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[100] bg-white flex flex-col"
+      className="fixed inset-0 z-[150] bg-white flex flex-col"
       dir={language === 'ar' ? 'rtl' : 'ltr'}
     >
      

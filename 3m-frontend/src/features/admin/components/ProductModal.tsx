@@ -3,6 +3,8 @@ import { X, Loader2, Image as ImageIcon } from 'lucide-react';
 import type { IProduct, ICategory, IProductVariant, IProductOffer } from '../../../types';
 import { useLanguageStore } from '../../../store/languageStore';
 import { translations } from '../../../lib/translations';
+import { productService } from '../../../services/productService';
+import { toast } from 'react-hot-toast';
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -23,6 +25,7 @@ interface ProductModalProps {
   isSubmitting: boolean;
   editingProduct: IProduct | null;
   categories: ICategory[];
+  refreshCategories?: () => Promise<void>;
 }
 
 export const ProductModal: React.FC<ProductModalProps> = ({
@@ -32,6 +35,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   isSubmitting,
   editingProduct,
   categories,
+  refreshCategories,
 }) => {
   const [prodName, setProdName] = useState('');
   const [prodDesc, setProdDesc] = useState('');
@@ -41,6 +45,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const [prodCoverFile, setProdCoverFile] = useState<File | null>(null);
   const [prodCoverPreview, setProdCoverPreview] = useState<string | null>(null);
   const [prodGalleryFiles, setProdGalleryFiles] = useState<FileList | null>(null);
+
+  // Inline Category states
+  const [showAddCatInline, setShowAddCatInline] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatDesc, setNewCatDesc] = useState('');
+  const [isAddingCatInline, setIsAddingCatInline] = useState(false);
 
   // Offer states
   const [hasOffer, setHasOffer] = useState(false);
@@ -52,50 +62,56 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const t = translations[language];
 
   useEffect(() => {
-    if (editingProduct) {
-      setProdName(editingProduct.name || '');
-      setProdDesc(editingProduct.description || '');
-      setProdPrice(editingProduct.price !== undefined && editingProduct.price !== null ? editingProduct.price.toString() : '');
-      setProdVariants(editingProduct.variants || []);
-      const catId = typeof editingProduct.categoryID === 'object' ? editingProduct.categoryID?._id : editingProduct.categoryID;
-      setProdCatId(catId || (categories[0]?._id || ''));
-      setProdCoverFile(null);
-      setProdCoverPreview(editingProduct.imageCover || null);
-      setProdGalleryFiles(null);
+    if (isOpen) {
+      setShowAddCatInline(false);
+      setNewCatName('');
+      setNewCatDesc('');
+      if (editingProduct) {
+        setProdName(editingProduct.name || '');
+        setProdDesc(editingProduct.description || '');
+        setProdPrice(editingProduct.price !== undefined && editingProduct.price !== null ? editingProduct.price.toString() : '');
+        setProdVariants(editingProduct.variants || []);
+        const catId = typeof editingProduct.categoryID === 'object' ? editingProduct.categoryID?._id : editingProduct.categoryID;
+        setProdCatId(catId || (categories[0]?._id || ''));
+        setProdCoverFile(null);
+        setProdCoverPreview(editingProduct.imageCover || null);
+        setProdGalleryFiles(null);
 
-      
-      if (editingProduct.offer && editingProduct.offer.discountedPrice !== undefined && editingProduct.offer.discountedPrice !== null) {
-        setHasOffer(true);
-        setDiscountedPrice(editingProduct.offer.discountedPrice.toString());
-        const formatLocal = (dStr: string) => {
-          if (!dStr) return '';
-          const d = new Date(dStr);
-          const pad = (n: number) => n.toString().padStart(2, '0');
-          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-        };
-        setOfferStartDate(editingProduct.offer.startDate ? formatLocal(editingProduct.offer.startDate) : '');
-        setOfferEndDate(editingProduct.offer.endDate ? formatLocal(editingProduct.offer.endDate) : '');
+        
+        if (editingProduct.offer && editingProduct.offer.discountedPrice !== undefined && editingProduct.offer.discountedPrice !== null) {
+          setHasOffer(true);
+          setDiscountedPrice(editingProduct.offer.discountedPrice.toString());
+          const formatLocal = (dStr: string) => {
+            if (!dStr) return '';
+            const d = new Date(dStr);
+            const pad = (n: number) => n.toString().padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+          };
+          setOfferStartDate(editingProduct.offer.startDate ? formatLocal(editingProduct.offer.startDate) : '');
+          setOfferEndDate(editingProduct.offer.endDate ? formatLocal(editingProduct.offer.endDate) : '');
+        } else {
+          setHasOffer(false);
+          setDiscountedPrice('');
+          setOfferStartDate('');
+          setOfferEndDate('');
+        }
       } else {
+        setProdName('');
+        setProdDesc('');
+        setProdPrice('');
+        setProdVariants([{ size: 'S', colorCode: '#000000', quantity: 10 }]);
+        setProdCatId(categories[0]?._id || '');
+        setProdCoverFile(null);
+        setProdCoverPreview(null);
+        setProdGalleryFiles(null);
         setHasOffer(false);
         setDiscountedPrice('');
         setOfferStartDate('');
         setOfferEndDate('');
       }
-    } else {
-      setProdName('');
-      setProdDesc('');
-      setProdPrice('');
-      setProdVariants([{ size: 'S', colorCode: '#000000', quantity: 10 }]);
-      setProdCatId(categories[0]?._id || '');
-      setProdCoverFile(null);
-      setProdCoverPreview(null);
-      setProdGalleryFiles(null);
-      setHasOffer(false);
-      setDiscountedPrice('');
-      setOfferStartDate('');
-      setOfferEndDate('');
     }
-  }, [editingProduct, isOpen, categories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingProduct, isOpen]);
 
   if (!isOpen) return null;
 
@@ -135,8 +151,35 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }));
   };
 
+  const handleAddCategoryInline = async () => {
+    if (!newCatName.trim()) {
+      toast.error(language === 'ar' ? 'اسم القسم مطلوب' : 'Category name is required');
+      return;
+    }
+    setIsAddingCatInline(true);
+    try {
+      const res = await productService.createCategory(newCatName.trim(), newCatDesc.trim());
+      const createdCategory = res.data;
+      toast.success(language === 'ar' ? 'تم إضافة القسم بنجاح' : 'Category created successfully');
+      
+      if (refreshCategories) {
+        await refreshCategories();
+      }
+      
+      setProdCatId(createdCategory._id);
+      setNewCatName('');
+      setNewCatDesc('');
+      setShowAddCatInline(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || (language === 'ar' ? 'فشل إضافة القسم' : 'Failed to create category'));
+    } finally {
+      setIsAddingCatInline(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         
         <div className="p-5 border-b border-neutral-100 flex justify-between items-center bg-neutral-50/50">
@@ -264,17 +307,61 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-neutral-500 block">{t.adminModalLabelProductCat}</label>
-            <select 
-              value={prodCatId}
-              onChange={(e) => setProdCatId(e.target.value)}
-              className="w-full border border-neutral-200 rounded-xl px-3 py-2 text-xs focus:border-black outline-none bg-neutral-50/30 cursor-pointer"
-              required
-            >
-              {categories.map(c => (
-                <option key={c._id} value={c._id}>{c.name}</option>
-              ))}
-            </select>
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] font-bold text-neutral-500 block">{t.adminModalLabelProductCat}</label>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddCatInline(!showAddCatInline);
+                  setNewCatName('');
+                  setNewCatDesc('');
+                }}
+                className="text-[9px] font-bold text-neutral-500 hover:text-black underline cursor-pointer"
+              >
+                {showAddCatInline 
+                  ? (language === 'ar' ? '✕ إلغاء' : '✕ Cancel') 
+                  : (language === 'ar' ? '+ قسم جديد' : '+ New Category')}
+              </button>
+            </div>
+            {!showAddCatInline ? (
+              <select 
+                value={prodCatId}
+                onChange={(e) => setProdCatId(e.target.value)}
+                className="w-full border border-neutral-200 rounded-xl px-3 py-2 text-xs focus:border-black outline-none bg-neutral-50/30 cursor-pointer"
+                required
+              >
+                {categories.map(c => (
+                  <option key={c._id} value={c._id}>{c.name}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-150 space-y-2 mt-1">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder={language === 'ar' ? 'اسم القسم الجديد *' : 'New category name *'}
+                    value={newCatName}
+                    onChange={(e) => setNewCatName(e.target.value)}
+                    className="flex-grow border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs bg-white outline-none focus:border-black"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCategoryInline}
+                    disabled={isAddingCatInline}
+                    className="bg-black text-white hover:bg-neutral-800 disabled:bg-neutral-400 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer flex-shrink-0"
+                  >
+                    {isAddingCatInline ? '...' : (language === 'ar' ? 'إضافة' : 'Add')}
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder={language === 'ar' ? 'وصف القسم (اختياري)' : 'Category description (optional)'}
+                  value={newCatDesc}
+                  onChange={(e) => setNewCatDesc(e.target.value)}
+                  className="w-full border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs bg-white outline-none focus:border-black"
+                />
+              </div>
+            )}
           </div>
 
           {/* Promotional Offer Setup */}

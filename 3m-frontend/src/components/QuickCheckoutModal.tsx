@@ -237,7 +237,7 @@ export function QuickCheckoutModal({ isOpen, onClose, product, selectedSize, sel
   ];
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 animate-in fade-in duration-300" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 animate-in fade-in duration-300" dir={isRTL ? 'rtl' : 'ltr'}>
       
       <div 
         className="fixed inset-0 bg-black/60 backdrop-blur-md"

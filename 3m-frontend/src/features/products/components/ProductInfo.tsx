@@ -295,7 +295,7 @@ export function ProductInfo({ product, reviews, averageRate }: ProductInfoProps)
 
      
       {showSizeGuide && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
           <div className="absolute inset-0" onClick={() => setShowSizeGuide(false)} />
           <div 
             className="bg-white rounded-3xl w-full max-w-md p-6 relative shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-10"

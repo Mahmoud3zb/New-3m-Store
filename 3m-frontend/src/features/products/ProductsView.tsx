@@ -213,7 +213,7 @@ export function ProductsView() {
 
        
         {mobileFiltersOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="fixed inset-0 z-[150] lg:hidden">
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileFiltersOpen(false)} />
             <div className={`absolute top-0 h-full w-72 bg-white p-6 shadow-2xl flex flex-col z-10 ${language === 'ar' ? 'right-0 text-right animate-slide-in-right' : 'left-0 text-left animate-slide-in-left'}`}>
               <div className="flex items-center justify-between border-b border-neutral-100 pb-4 mb-6">

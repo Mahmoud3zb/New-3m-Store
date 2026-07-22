@@ -89,7 +89,7 @@ export function CartDrawer() {
   const finalPrice = Math.max(0, totalCartPrice - discountAmount);
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="fixed inset-0 z-[150] flex justify-end" dir={isRTL ? 'rtl' : 'ltr'}>
       
       <div 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
