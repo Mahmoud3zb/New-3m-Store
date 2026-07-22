@@ -5,6 +5,7 @@ import { Cart } from "../../cart/cart-model";
 import { Product } from "../../product/product-model";
 import { Promo } from "../../promo/promo-model";
 import { body } from "express-validator";
+import { emailService } from "../../services/email-service";
 
 export const validator = [
     body("shippingAddress.street")
@@ -192,7 +193,8 @@ export const createOrder: RequestHandler<{}, IResponse, IRequest> = async (req, 
             { path: "items.productID", select: "name imageCover" }
         ]);
 
-
+        // Send email alert to customer (non-blocking)
+        emailService.sendNewOrderCustomerAlert(newOrder).catch(err => console.error("Customer order email error:", err));
 
         return res.status(201).json({
             message: "Order created successfully",

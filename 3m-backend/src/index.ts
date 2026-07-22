@@ -19,6 +19,8 @@ import settingsRouter from "./settings/settings-router";
 import { checkMaintenance } from "./middlewares/checkMaintenance.middleware";
 import rateLimit from "express-rate-limit";
 import { logger } from "./services/logger";
+import { Product } from "./product/product-model";
+import { Category } from "./category/category-model";
 // import { setupSwagger } from './src/swagger';
 
 import dns from "dns";
@@ -124,6 +126,38 @@ if (!process.env.VERCEL) {
         logger.info(`Server is running on http://localhost:${PORT}`);
     });
 }
+
+app.get("/sitemap.xml", async (req, res) => {
+    try {
+        const baseUrl = process.env.FRONTEND_URL || "https://3m-store2.vercel.app";
+        const products = await Product.find({}, "_id updatedAt");
+        const categories = await Category.find({}, "_id updatedAt");
+        
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+        xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+        xml += `  <url>\n    <loc>${baseUrl}/</loc>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+        xml += `  <url>\n    <loc>${baseUrl}/shop</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+        xml += `  <url>\n    <loc>${baseUrl}/about</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
+        
+        categories.forEach(cat => {
+            const date = (cat as any).updatedAt ? new Date((cat as any).updatedAt).toISOString() : new Date().toISOString();
+            xml += `  <url>\n    <loc>${baseUrl}/shop?categoryID=${cat._id}</loc>\n    <lastmod>${date}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+        });
+        
+        products.forEach(prod => {
+            const date = (prod as any).updatedAt ? new Date((prod as any).updatedAt).toISOString() : new Date().toISOString();
+            xml += `  <url>\n    <loc>${baseUrl}/product/${prod._id}</loc>\n    <lastmod>${date}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+        });
+        
+        xml += `</urlset>`;
+        
+        res.header("Content-Type", "application/xml");
+        res.status(200).send(xml);
+    } catch (err) {
+        console.error("Sitemap generation error:", err);
+        res.status(500).send("Error generating sitemap");
+    }
+});
 
 app.get("/", (req, res) => {
   res.send("Backend is running");

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { Order } from "../order-model";
 import { Product } from "../../product/product-model";
 import { body } from "express-validator";
+import { emailService } from "../../services/email-service";
 import { Promo } from "../../promo/promo-model";
 
 export const directValidator = [
@@ -167,7 +168,8 @@ export const directOrder: RequestHandler<{}, IResponse, IDirectRequest> = async 
             { path: "items.productID", select: "name imageCover" }
         ]);
 
-
+        // Send email alert to customer (non-blocking)
+        emailService.sendNewOrderCustomerAlert(newOrder).catch(err => console.error("Customer direct order email error:", err));
 
         return res.status(201).json({
             message: "Direct order created successfully",
