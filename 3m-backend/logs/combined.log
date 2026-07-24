@@ -23,3 +23,5 @@
 {"level":"info","message":"MongoDB connected successfully","timestamp":"2026-07-24 17:12:10"}
 {"level":"info","message":"Server is running on http://localhost:3000","timestamp":"2026-07-24 17:21:32"}
 {"level":"info","message":"MongoDB connected successfully","timestamp":"2026-07-24 17:21:35"}
+{"level":"info","message":"Server is running on http://localhost:3000","timestamp":"2026-07-24 18:25:46"}
+{"level":"info","message":"MongoDB connected successfully","timestamp":"2026-07-24 18:25:48"}
