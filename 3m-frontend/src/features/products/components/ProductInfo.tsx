@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Heart, ShoppingBag, Star, ShieldCheck, Ruler, X, Calendar, MessageSquare } from 'lucide-react';
+import { Heart, ShoppingBag, Star, ShieldCheck, Ruler, X, Calendar, MessageSquare, MessageCircle, Share2, Link2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useCartStore } from '../../../store/cartStore';
 import { useWishlistStore } from '../../../store/wishlistStore';
 import { useAuthStore } from '../../../store/authStore';
@@ -56,6 +57,54 @@ export function ProductInfo({ product, reviews, averageRate }: ProductInfoProps)
       return;
     }
     setIsQuickCheckoutOpen(true);
+  };
+
+  const handleWhatsAppOrder = () => {
+    if (!selectedSize || !selectedColor) {
+      toast.error(
+        language === 'ar' 
+          ? 'برجاء اختيار المقاس واللون أولاً!' 
+          : 'Please select size and color first!'
+      );
+      return;
+    }
+
+    const phone = '201006488707';
+    const message = language === 'ar'
+      ? `السلام عليكم، أود طلب المنتج التالي من متجركم:
+- المنتج: ${product.name}
+- المقاس: ${selectedSize}
+- اللون: ${selectedColor}
+- السعر: ${product.price} ج.م
+- رابط المنتج: ${window.location.href}`
+      : `Hello, I would like to order the following product:
+- Product: ${product.name}
+- Size: ${selectedSize}
+- Color: ${selectedColor}
+- Price: ${product.price} EGP
+- Product Link: ${window.location.href}`;
+
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleSocialShare = (platform: 'whatsapp' | 'facebook' | 'copy') => {
+    const url = window.location.href;
+    const text = language === 'ar' 
+      ? `بص على المنتج الجميل ده في متجر 3M: ${product.name}`
+      : `Check out this beautiful product at 3M Store: ${product.name}`;
+
+    if (platform === 'whatsapp') {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+    } else if (platform === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+    } else if (platform === 'copy') {
+      navigator.clipboard.writeText(url);
+      toast.success(
+        language === 'ar' 
+          ? 'تم نسخ رابط المنتج بنجاح!' 
+          : 'Product link copied successfully!'
+      );
+    }
   };
 
   return (
@@ -246,6 +295,19 @@ export function ProductInfo({ product, reviews, averageRate }: ProductInfoProps)
           {(product.variants?.reduce((sum: number, v: any) => sum + v.quantity, 0) ?? 0) === 0 ? t.outOfStock : (language === 'ar' ? 'شراء الآن (الدفع عند الاستلام)' : 'Buy Now (Cash on Delivery)')}
         </button>
 
+        <button
+          onClick={handleWhatsAppOrder}
+          disabled={(product.variants?.reduce((sum: number, v: any) => sum + v.quantity, 0) ?? 0) === 0}
+          className={`w-full text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
+            (product.variants?.reduce((sum: number, v: any) => sum + v.quantity, 0) ?? 0) === 0
+              ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed border border-neutral-100'
+              : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/10'
+          }`}
+        >
+          <MessageCircle className="w-4.5 h-4.5" />
+          {(product.variants?.reduce((sum: number, v: any) => sum + v.quantity, 0) ?? 0) === 0 ? t.outOfStock : (language === 'ar' ? 'اطلب سريعاً عبر واتساب' : 'Order via WhatsApp')}
+        </button>
+
         <div className="flex gap-4">
           <button
             onClick={handleAddToCart}
@@ -274,6 +336,36 @@ export function ProductInfo({ product, reviews, averageRate }: ProductInfoProps)
               fill={isWishlisted ? 'currentColor' : 'none'}
             />
           </button>
+        </div>
+
+        {/* Social Sharing Section */}
+        <div className="border-t border-neutral-100 pt-6 space-y-3">
+          <span className="text-[10px] text-neutral-450 font-bold uppercase tracking-wider block">
+            {language === 'ar' ? 'مشاركة المنتج:' : 'Share Product:'}
+          </span>
+          <div className="flex gap-2.5">
+            <button 
+              onClick={() => handleSocialShare('whatsapp')}
+              className="flex-1 py-2 px-3 border border-neutral-200 hover:border-black transition-colors rounded-xl text-[10px] font-bold text-neutral-600 hover:text-black flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+              <span>{language === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
+            </button>
+            <button 
+              onClick={() => handleSocialShare('facebook')}
+              className="flex-1 py-2 px-3 border border-neutral-200 hover:border-black transition-colors rounded-xl text-[10px] font-bold text-neutral-600 hover:text-black flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Share2 className="w-3.5 h-3.5 text-[#1877F2]" />
+              <span>{language === 'ar' ? 'فيسبوك' : 'Facebook'}</span>
+            </button>
+            <button 
+              onClick={() => handleSocialShare('copy')}
+              className="flex-1 py-2 px-3 border border-neutral-200 hover:border-black transition-colors rounded-xl text-[10px] font-bold text-neutral-600 hover:text-black flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Link2 className="w-3.5 h-3.5 text-neutral-500" />
+              <span>{language === 'ar' ? 'نسخ الرابط' : 'Copy Link'}</span>
+            </button>
+          </div>
         </div>
       </div>
 

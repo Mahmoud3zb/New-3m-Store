@@ -59,11 +59,14 @@ export const WhatsAppWidget: React.FC = () => {
   return (
     <div 
       className="fixed bottom-24 md:bottom-8 right-6 md:right-8 z-40 flex items-center gap-3 pointer-events-none select-none"
-      dir={language === 'ar' ? 'rtl' : 'ltr'}
+      dir="ltr"
     >
       
       {showTooltip && (
-        <div className="relative bg-white text-neutral-800 text-[11px] font-bold px-3.5 py-2.5 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] border border-neutral-100 flex items-center gap-2 max-w-[200px] md:max-w-xs animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto">
+        <div 
+          className="relative bg-white text-neutral-800 text-[11px] font-bold px-3.5 py-2.5 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] border border-neutral-100 flex items-center gap-2 max-w-[200px] md:max-w-xs animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto"
+          dir={language === 'ar' ? 'rtl' : 'ltr'}
+        >
           <span>{t.whatsappTooltip}</span>
           <button 
             onClick={() => setShowTooltip(false)}
@@ -73,9 +76,7 @@ export const WhatsAppWidget: React.FC = () => {
             <X className="w-3 h-3" />
           </button>
           
-          <div className={`absolute bottom-1/2 translate-y-1/2 w-2.5 h-2.5 bg-white border-b border-r border-neutral-100 rotate-[45deg] ${
-            language === 'ar' ? '-left-1.5 border-l border-t-0 border-r-0' : '-right-1.5 border-r border-b-0 border-t-0'
-          }`} />
+          <div className="absolute bottom-1/2 translate-y-1/2 w-2.5 h-2.5 bg-white border-b border-r border-neutral-100 rotate-[45deg] -right-1.5" />
         </div>
       )}
 

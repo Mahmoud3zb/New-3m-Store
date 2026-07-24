@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Calendar, Clock, MapPin, CreditCard, ChevronUp, ChevronDown } from 'lucide-react';
+import { ClipboardList, Calendar, Clock, MapPin, CreditCard, ChevronUp, ChevronDown, Download } from 'lucide-react';
 import type { IOrder } from '../../../services/orderService';
 import { useLanguageStore } from '../../../store/languageStore';
 import { translations } from '../../../lib/translations';
@@ -14,6 +14,149 @@ export function UserOrdersList({ orders }: UserOrdersListProps) {
   const t = translations[language];
 
   const [expandedOrderID, setExpandedOrderID] = useState<string | null>(null);
+
+  const handlePrintInvoice = (order: IOrder) => {
+    const isAr = language === 'ar';
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const itemsHtml = order.items.map((item: any) => `
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 10px; text-align: ${isAr ? 'right' : 'left'};">${item.productID?.name || (isAr ? 'منتج غير متوفر' : 'Unavailable Product')}</td>
+        <td style="padding: 10px; text-align: center;">${item.size || 'N/A'}</td>
+        <td style="padding: 10px; text-align: center;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: ${item.colorCode}; border: 1px solid #ddd; vertical-align: middle;"></span></td>
+        <td style="padding: 10px; text-align: center;">${item.quantity}</td>
+        <td style="padding: 10px; text-align: ${isAr ? 'left' : 'right'};">${item.price} EGP</td>
+        <td style="padding: 10px; text-align: ${isAr ? 'left' : 'right'}; font-weight: bold;">${item.price * item.quantity} EGP</td>
+      </tr>
+    `).join("");
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="${isAr ? 'ar' : 'en'}" dir="${isAr ? 'rtl' : 'ltr'}">
+      <head>
+        <meta charset="UTF-8">
+        <title>Invoice #${order._id}</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; margin: 0; padding: 40px; }
+          .header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { font-size: 24px; font-weight: 800; tracking: 0.1em; }
+          .title { font-size: 20px; font-weight: bold; }
+          .details { display: flex; justify-content: space-between; margin-bottom: 40px; font-size: 13px; line-height: 1.6; }
+          .details div { flex: 1; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 13px; }
+          th { background-color: #f9f9f9; padding: 12px 10px; border-bottom: 1px solid #ddd; font-weight: bold; }
+          .totals { margin-${isAr ? 'right' : 'left'}: auto; width: 300px; font-size: 14px; line-height: 2; }
+          .totals div { display: flex; justify-content: space-between; }
+          .totals .final { font-size: 16px; font-weight: bold; border-top: 1.5px solid #333; padding-top: 5px; margin-top: 5px; }
+          .footer { text-align: center; font-size: 11px; color: #777; margin-top: 60px; border-top: 1px solid #eee; padding-top: 20px; }
+          @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <div class="logo">3M STORE</div>
+            <div style="font-size: 12px; color: #777; margin-top: 5px;">Boutique Clothing & Apparel</div>
+          </div>
+          <div style="text-align: ${isAr ? 'left' : 'right'};">
+            <div class="title">${isAr ? 'فاتورة طلب شراء' : 'ORDER INVOICE'}</div>
+            <div style="font-size: 12px; color: #777; margin-top: 5px;">#${order._id}</div>
+          </div>
+        </div>
+
+        <div class="details">
+          <div>
+            <strong>${isAr ? 'العميل:' : 'Customer Details:'}</strong>
+            <div>${order.userID?.name || (isAr ? 'عميل غير معروف' : 'Unknown')}</div>
+            <div>${order.userID?.email || ''}</div>
+            <div>${order.shippingAddress?.phone}</div>
+          </div>
+          <div style="text-align: center;">
+            <strong>${isAr ? 'تاريخ الطلب:' : 'Order Date:'}</strong>
+            <div>${new Date(order.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US')}</div>
+            <div>${new Date(order.createdAt).toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+          <div style="text-align: ${isAr ? 'left' : 'right'};">
+            <strong>${isAr ? 'عنوان الشحن:' : 'Shipping Address:'}</strong>
+            <div>${order.shippingAddress?.city}</div>
+            <div>${order.shippingAddress?.street}</div>
+            <div>${order.paymentMethod === 'cash' ? (isAr ? 'الدفع عند الاستلام' : 'Cash on Delivery') : (isAr ? 'بطاقة ائتمانية' : 'Credit Card')}</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align: ${isAr ? 'right' : 'left'};">${isAr ? 'المنتج' : 'Product'}</th>
+              <th>${isAr ? 'المقاس' : 'Size'}</th>
+              <th>${isAr ? 'اللون' : 'Color'}</th>
+              <th>${isAr ? 'الكمية' : 'Qty'}</th>
+              <th style="text-align: ${isAr ? 'left' : 'right'};">${isAr ? 'سعر القطعة' : 'Unit Price'}</th>
+              <th style="text-align: ${isAr ? 'left' : 'right'};">${isAr ? 'الإجمالي' : 'Total'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div>
+            <span>${isAr ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+            <span>${order.totalPrice - (order.paymentMethod === 'cash' ? 100 : 0)} EGP</span>
+          </div>
+          <div>
+            <span>${isAr ? 'تكلفة الشحن:' : 'Shipping Fee:'}</span>
+            <span>${order.paymentMethod === 'cash' ? 100 : 0} EGP</span>
+          </div>
+          <div class="final">
+            <span>${isAr ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
+            <span>${order.totalPrice} EGP</span>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>${isAr ? 'شكراً لتسوقكم معنا!' : 'Thank you for shopping with us!'}</p>
+          <p>www.3m-store.com</p>
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() { window.close(); }, 500);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
+  const timelineStatuses = ['pending', 'processing', 'shipped', 'delivered'];
+  const statusLabelsAr: Record<string, string> = {
+    pending: 'معلق',
+    processing: 'تجهيز',
+    shipped: 'شحن',
+    delivered: 'توصيل'
+  };
+  const statusLabelsEn: Record<string, string> = {
+    pending: 'Pending',
+    processing: 'Processing',
+    shipped: 'Shipped',
+    delivered: 'Delivered'
+  };
+
+  const getStatusStepIndex = (status: string) => {
+    const idx = timelineStatuses.indexOf(status);
+    return idx !== -1 ? idx : 0;
+  };
 
   const toggleOrderDetails = (orderID: string) => {
     setExpandedOrderID(expandedOrderID === orderID ? null : orderID);
@@ -183,8 +326,63 @@ export function UserOrdersList({ orders }: UserOrdersListProps) {
               </div>
 
               
+              {/* Order Status Timeline */}
+              <div className="bg-white border border-neutral-100 rounded-2xl p-5 space-y-4">
+                <span className="text-[10px] text-neutral-450 font-bold block">
+                  {language === 'ar' ? 'حالة الطلب:' : 'Order Progress Timeline:'}
+                </span>
+                <div className="relative flex justify-between items-center max-w-md mx-auto pt-2 pb-5">
+                  {/* Connection Line */}
+                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-neutral-100 -z-10" />
+                  <div 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-neutral-900 transition-all duration-500 -z-10" 
+                    style={{ 
+                      width: `${(getStatusStepIndex(order.status) / (timelineStatuses.length - 1)) * 100}%`,
+                      [language === 'ar' ? 'right' : 'left']: 0,
+                      [language === 'ar' ? 'left' : 'right']: 'auto',
+                    }} 
+                  />
+
+                  {timelineStatuses.map((step, index) => {
+                    const stepIndex = getStatusStepIndex(order.status);
+                    const isCompleted = index <= stepIndex;
+                    const isActive = index === stepIndex;
+                    return (
+                      <div key={step} className="flex flex-col items-center space-y-1.5 relative">
+                        <div 
+                          className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-[10px] font-bold ${
+                            isCompleted 
+                              ? 'bg-neutral-900 border-neutral-900 text-white shadow-sm' 
+                              : 'bg-white border-neutral-200 text-neutral-400'
+                          } ${isActive ? 'ring-4 ring-neutral-900/10 scale-110' : ''}`}
+                        >
+                          {index + 1}
+                        </div>
+                        <span 
+                          className={`text-[9px] font-bold absolute -bottom-5 whitespace-nowrap transition-colors ${
+                            isCompleted ? 'text-neutral-900' : 'text-neutral-400'
+                          }`}
+                        >
+                          {language === 'ar' ? statusLabelsAr[step] : statusLabelsEn[step]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              
               <div className="space-y-3">
-                <span className="text-[10px] text-neutral-400 font-bold block">{t.orderItemsTitle}</span>
+                <div className="flex justify-between items-center gap-4 flex-wrap">
+                  <span className="text-[10px] text-neutral-400 font-bold block">{t.orderItemsTitle}</span>
+                  <button 
+                    onClick={() => handlePrintInvoice(order)}
+                    className="inline-flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer border border-neutral-200/50"
+                  >
+                    <Download className="w-3 h-3" />
+                    {language === 'ar' ? 'تحميل الفاتورة PDF' : 'Download Invoice PDF'}
+                  </button>
+                </div>
                 
                 <div className="space-y-2.5">
                   {order.items.map((item, index) => (
@@ -204,9 +402,17 @@ export function UserOrdersList({ orders }: UserOrdersListProps) {
                           <span className="text-xs font-bold text-neutral-800 block truncate max-w-[200px] md:max-w-md">
                             {item.productID?.name || t.productUnavailable}
                           </span>
-                          <span className="text-[10px] text-neutral-400 font-serif-en">
+                          <span className="text-[10px] text-neutral-400 font-serif-en block">
                             {t.quantityLabel}: {item.quantity} × {formatPrice(item.price)}
                           </span>
+                          <div className="flex items-center gap-2 mt-1 text-[9px] text-neutral-500 font-medium">
+                            <span>{language === 'ar' ? `المقاس: ${item.size}` : `Size: ${item.size}`}</span>
+                            <span className="w-1 h-1 bg-neutral-300 rounded-full" />
+                            <span className="flex items-center gap-1">
+                              {language === 'ar' ? 'اللون:' : 'Color:'}
+                              <span className="w-2.5 h-2.5 rounded-full border border-neutral-200 inline-block align-middle" style={{ backgroundColor: item.colorCode }} />
+                            </span>
+                          </div>
                         </div>
                       </div>
                       

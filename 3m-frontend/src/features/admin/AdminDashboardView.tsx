@@ -29,8 +29,8 @@ export default function AdminDashboardView() {
   const getAllAllowedTabs = (): ('analytics' | 'orders' | 'products' | 'categories' | 'users' | 'promos' | 'settings')[] => {
     if (!user) return [];
     
-    // Super Admin is either admin@gmail.com OR someone who has all 4 permissions
-    const isSuper = user.email === 'admin@gmail.com' || (user.permissions && user.permissions.length === 4);
+    // Super Admin is either admin@gmail.com OR someone who has all 5 permissions
+    const isSuper = user.email === 'admin@gmail.com' || (user.permissions && user.permissions.length === 5);
     
     if (isSuper) {
       return ['analytics', 'orders', 'products', 'categories', 'users', 'promos', 'settings'];
@@ -41,11 +41,13 @@ export default function AdminDashboardView() {
     
     if (perms.includes('can_view_analytics')) allowed.push('analytics');
     if (perms.includes('can_view_orders')) allowed.push('orders');
-    if (perms.includes('can_add_products')) {
+    if (perms.includes('can_manage_products')) {
       allowed.push('products');
       allowed.push('categories');
+      allowed.push('promos');
     }
-    if (perms.includes('can_manage_coupons')) allowed.push('promos');
+    if (perms.includes('can_manage_users')) allowed.push('users');
+    if (perms.includes('can_manage_settings')) allowed.push('settings');
     
     return allowed;
   };

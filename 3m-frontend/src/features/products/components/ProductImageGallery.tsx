@@ -10,6 +10,27 @@ interface ProductImageGalleryProps {
 
 export function ProductImageGallery({ product }: ProductImageGalleryProps) {
   const [activeImage, setActiveImage] = useState<string>('');
+  const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({
+    transformOrigin: 'center center',
+    transform: 'scale(1)'
+  });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+      transform: 'scale(1.8)'
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomStyle({
+      transformOrigin: 'center center',
+      transform: 'scale(1)'
+    });
+  };
 
   useEffect(() => {
     if (product) {
@@ -23,11 +44,16 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
 
   return (
     <div className="lg:col-span-6 space-y-4">
-      <div className="aspect-[3/4] bg-neutral-50 border border-neutral-100 rounded-3xl overflow-hidden shadow-sm relative group">
+      <div 
+        className="aspect-[3/4] bg-neutral-50 border border-neutral-100 rounded-3xl overflow-hidden shadow-sm relative group cursor-zoom-in"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
         <img
           src={activeImage || product.imageCover || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          style={zoomStyle}
+          className="w-full h-full object-cover transition-transform duration-100 ease-out"
         />
       </div>
 

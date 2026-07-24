@@ -13,6 +13,8 @@ export interface IOrderItem {
     imageCover?: string;
     price: number;
   };
+  size: string;
+  colorCode: string;
   quantity: number;
   price: number;
 }

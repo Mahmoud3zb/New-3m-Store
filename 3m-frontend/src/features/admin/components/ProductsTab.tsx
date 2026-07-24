@@ -93,7 +93,27 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                       </td>
                       <td className="p-4 md:p-5 font-bold text-neutral-800 font-serif-en" dir="ltr">{formatPrice(product.price)}</td>
                       <td className="p-4 md:p-5 font-bold text-neutral-500 font-serif-en">
-                        {(product.variants || []).reduce((sum, v) => sum + v.quantity, 0)} {t.adminProductPiece}
+                        {(() => {
+                          const totalQty = (product.variants || []).reduce((sum, v) => sum + v.quantity, 0);
+                          if (totalQty === 0) {
+                            return (
+                              <span className="inline-flex items-center gap-1 text-[9px] text-red-650 bg-red-50 border border-red-100 px-2.5 py-0.5 rounded-full font-bold">
+                                {language === 'ar' ? 'نفذ المخزون' : 'Out of stock'}
+                              </span>
+                            );
+                          }
+                          if (totalQty <= 5) {
+                            return (
+                              <div className="space-y-1">
+                                <span className="block text-neutral-800">{totalQty} {t.adminProductPiece}</span>
+                                <span className="inline-flex items-center gap-1 text-[9px] text-amber-650 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full font-bold">
+                                  {language === 'ar' ? 'مخزون منخفض' : 'Low stock'}
+                                </span>
+                              </div>
+                            );
+                          }
+                          return <span className="text-neutral-800">{totalQty} {t.adminProductPiece}</span>;
+                        })()}
                       </td>
                       <td className="p-4 md:p-5">
                         <div className="flex items-center justify-center gap-2">

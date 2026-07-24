@@ -7,10 +7,11 @@ export enum Role {
 
 // Predefined granular admin permissions
 export enum Permission {
-    CanAddProducts = "can_add_products",
-    CanViewOrders = "can_view_orders",
-    CanManageCoupons = "can_manage_coupons",
     CanViewAnalytics = "can_view_analytics",
+    CanViewOrders = "can_view_orders",
+    CanManageProducts = "can_manage_products",
+    CanManageUsers = "can_manage_users",
+    CanManageSettings = "can_manage_settings",
 }
 
 export interface IAddress {

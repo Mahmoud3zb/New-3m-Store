@@ -22,10 +22,11 @@ export function UsersTab() {
   const [isCreating, setIsCreating] = useState(false);
 
   const AVAILABLE_PERMISSIONS = [
-    { id: 'can_add_products', ar: 'إضافة وتعديل المنتجات', en: 'Add/Edit Products' },
-    { id: 'can_view_orders', ar: 'استعراض وإدارة الطلبات', en: 'View/Manage Orders' },
-    { id: 'can_manage_coupons', ar: 'إدارة الكوبونات والخصومات', en: 'Manage Coupons' },
-    { id: 'can_view_analytics', ar: 'استعراض الإحصائيات والتحليلات', en: 'View Analytics' },
+    { id: 'can_view_analytics', ar: 'الاحصائيات والتقارير', en: 'Analytics & Reports' },
+    { id: 'can_view_orders', ar: 'ادارة الطلبات', en: 'Orders Management' },
+    { id: 'can_manage_products', ar: 'ادارة المنتجات والاقسام واكواد الخصم', en: 'Manage Products, Categories & Coupons' },
+    { id: 'can_manage_users', ar: 'ادارة المستخدمين', en: 'Users Management' },
+    { id: 'can_manage_settings', ar: 'اعدادات المتجر', en: 'Store Settings' },
   ];
 
   const handlePermissionToggle = (permId: string) => {

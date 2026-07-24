@@ -8,6 +8,7 @@ import { Heart, ShoppingBag, SlidersHorizontal, X, Search } from 'lucide-react';
 import { Skeleton } from '../../components/ui/skeleton';
 import { useLanguageStore } from '../../store/languageStore';
 import { translations } from '../../lib/translations';
+import { toast } from 'react-hot-toast';
 
 export function ProductsView() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -95,6 +96,18 @@ export function ProductsView() {
 
   const handleAddToCart = (product: any) => {
     addItem(product);
+  };
+
+  const handleQuickAddSize = (product: any, size: string) => {
+    const matchingVariant = product.variants?.find((v: any) => v.size === size && v.quantity > 0) 
+      || product.variants?.find((v: any) => v.size === size);
+    const color = matchingVariant ? matchingVariant.colorCode : (product.variants?.[0]?.colorCode || '');
+    addItem(product, 1, size, color);
+    toast.success(
+      language === 'ar'
+        ? `تم إضافة مقاس ${size} إلى السلة!`
+        : `Size ${size} added to cart!`
+    );
   };
 
   return (
@@ -352,6 +365,40 @@ export function ProductsView() {
                             fill={wishlistItems.some((item) => item._id === product._id) ? 'currentColor' : 'none'}
                           />
                         </button>
+
+                        {/* Quick Size Add Overlay (Desktop only) */}
+                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hidden lg:flex flex-col justify-end">
+                          <span className="text-[9px] text-white/90 font-bold mb-1.5 text-center">
+                            {language === 'ar' ? 'إضافة سريعة للمقاس:' : 'Quick Add Size:'}
+                          </span>
+                          <div className="flex gap-1.5 justify-center flex-wrap" dir="ltr">
+                            {Array.from(new Set((product.variants as any[])?.map((v) => v.size) || []))
+                              .map((size) => {
+                                const variantForSize = product.variants?.find((v: any) => v.size === size);
+                                const isOutOfStock = !variantForSize || variantForSize.quantity === 0;
+                                return (
+                                  <button
+                                    key={size}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      if (!isOutOfStock) {
+                                        handleQuickAddSize(product, size);
+                                      }
+                                    }}
+                                    disabled={isOutOfStock}
+                                    className={`h-7 px-2.5 rounded-lg text-[10px] font-black tracking-wider transition-all flex items-center justify-center border ${
+                                      isOutOfStock
+                                        ? 'bg-neutral-900/45 text-neutral-500 border-neutral-800 cursor-not-allowed line-through'
+                                        : 'bg-white text-black border-white hover:bg-neutral-100 cursor-pointer shadow-sm hover:scale-105 active:scale-95'
+                                    }`}
+                                  >
+                                    {size}
+                                  </button>
+                                );
+                              })}
+                          </div>
+                        </div>
                       </div>
 
                   
@@ -396,6 +443,40 @@ export function ProductsView() {
                               {product.price} {t.currency}
                             </span>
                           )}
+                        </div>
+                      </div>
+
+                      {/* Available Sizes Row (Mobile only) */}
+                      <div className="lg:hidden block mb-4 mt-2">
+                        <span className="text-[9px] text-neutral-450 font-bold block mb-1">
+                          {language === 'ar' ? 'المقاسات المتاحة:' : 'Available Sizes:'}
+                        </span>
+                        <div className="flex gap-1.5 flex-wrap" dir="ltr">
+                          {Array.from(new Set((product.variants as any[])?.map((v) => v.size) || []))
+                            .map((size) => {
+                              const variantForSize = product.variants?.find((v: any) => v.size === size);
+                              const isOutOfStock = !variantForSize || variantForSize.quantity === 0;
+                              return (
+                                <button
+                                  key={size}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!isOutOfStock) {
+                                      handleQuickAddSize(product, size);
+                                    }
+                                  }}
+                                  disabled={isOutOfStock}
+                                  className={`h-7 min-w-[32px] px-2.5 rounded-lg text-[9px] font-black tracking-wider transition-all flex items-center justify-center border ${
+                                    isOutOfStock
+                                      ? 'bg-neutral-50 text-neutral-350 border-neutral-100 cursor-not-allowed line-through'
+                                      : 'bg-white text-neutral-800 border-neutral-200 hover:border-black cursor-pointer shadow-sm hover:scale-105 active:scale-95'
+                                  }`}
+                                >
+                                  {size}
+                                </button>
+                              );
+                            })}
                         </div>
                       </div>
 

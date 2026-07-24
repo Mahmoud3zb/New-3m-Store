@@ -24,6 +24,7 @@ export function AnalyticsDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [timeRange, setTimeRange] = useState<'7' | '30'>('30');
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -128,7 +129,23 @@ export function AnalyticsDashboard() {
     );
   }
 
-  const { kpis, statusDistribution, trend, bestSellers, governorates } = data;
+  const { kpis, statusDistribution, trend: originalTrend, bestSellers, governorates } = data;
+
+  const filteredTrend = timeRange === '7' ? originalTrend.slice(-7) : originalTrend;
+  const trend = filteredTrend;
+
+  const dynamicKpis = (() => {
+    if (timeRange === '30') {
+      return kpis;
+    }
+    const rev = filteredTrend.reduce((sum, t) => sum + t.revenue, 0);
+    const ord = filteredTrend.reduce((sum, t) => sum + t.orders, 0);
+    return {
+      totalRevenue: rev,
+      totalOrders: ord,
+      avgOrderValue: ord > 0 ? Math.round(rev / ord) : 0
+    };
+  })();
 
   
   const chartWidth = 600;
@@ -168,14 +185,25 @@ export function AnalyticsDashboard() {
           </p>
         </div>
 
-        <button
-          onClick={handleExportCSV}
-          disabled={isExporting}
-          className="flex items-center gap-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer disabled:bg-neutral-200 disabled:text-neutral-400"
-        >
-          {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          {isRTL ? 'تصدير الطلبات كـ CSV' : 'Export Orders to CSV'}
-        </button>
+        <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value as '7' | '30')}
+            className="bg-white border border-neutral-200 hover:border-black transition-colors rounded-xl text-xs font-bold px-3 py-2.5 outline-none cursor-pointer"
+          >
+            <option value="30">{isRTL ? 'آخر 30 يوم' : 'Last 30 Days'}</option>
+            <option value="7">{isRTL ? 'آخر 7 أيام' : 'Last 7 Days'}</option>
+          </select>
+
+          <button
+            onClick={handleExportCSV}
+            disabled={isExporting}
+            className="flex items-center gap-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer disabled:bg-neutral-200 disabled:text-neutral-400"
+          >
+            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {isRTL ? 'تصدير الطلبات كـ CSV' : 'Export Orders to CSV'}
+          </button>
+        </div>
       </div>
 
      
@@ -188,7 +216,7 @@ export function AnalyticsDashboard() {
               {isRTL ? 'إجمالي الإيرادات' : 'Total Revenue'}
             </span>
             <h3 className="text-xl font-black text-neutral-900 font-serif-en">
-              {formatCurrency(kpis.totalRevenue)}
+              {formatCurrency(dynamicKpis.totalRevenue)}
             </h3>
             <span className="text-[10px] text-green-600 font-bold flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />
@@ -207,7 +235,7 @@ export function AnalyticsDashboard() {
               {isRTL ? 'إجمالي الطلبات' : 'Total Orders'}
             </span>
             <h3 className="text-xl font-black text-neutral-900 font-serif-en">
-              {formatNumber(kpis.totalOrders)}
+              {formatNumber(dynamicKpis.totalOrders)}
             </h3>
             <span className="text-[10px] text-neutral-400 font-bold">
               {isRTL ? 'طلب شراء مكتمل ومباشر' : 'Completed and direct orders'}
@@ -225,7 +253,7 @@ export function AnalyticsDashboard() {
               {isRTL ? 'متوسط قيمة الطلب' : 'Average Order Value'}
             </span>
             <h3 className="text-xl font-black text-neutral-900 font-serif-en">
-              {formatCurrency(kpis.avgOrderValue)}
+              {formatCurrency(dynamicKpis.avgOrderValue)}
             </h3>
             <span className="text-[10px] text-neutral-400 font-bold">
               {isRTL ? 'متوسط سلة المشتريات' : 'Average shopping basket value'}
