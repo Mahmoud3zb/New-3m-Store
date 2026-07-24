@@ -20,6 +20,7 @@ interface OrdersTabProps {
   expandedOrderID: string | null;
   setExpandedOrderID: (id: string | null) => void;
   handleStatusChange: (orderId: string, newStatus: string) => void;
+  handlePaymentStatusToggle: (orderId: string, isPaid: boolean) => void;
   formatPrice: (price: number) => string;
 }
 
@@ -29,6 +30,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
   expandedOrderID,
   setExpandedOrderID,
   handleStatusChange,
+  handlePaymentStatusToggle,
   formatPrice,
 }) => {
   const { language } = useLanguageStore();
@@ -232,15 +234,20 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                       </select>
                     </div>
  
-                    {order.isPaid ? (
-                      <span className="inline-flex items-center gap-1 text-[9px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                        {t.adminOrderPaid}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-[9px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
-                        {t.adminOrderUnpaid}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1.5">
+                      <select
+                        value={order.isPaid ? 'paid' : 'unpaid'}
+                        onChange={(e) => handlePaymentStatusToggle(order._id, e.target.value === 'paid')}
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded-xl border focus:outline-none transition-all cursor-pointer ${
+                          order.isPaid 
+                            ? 'bg-green-50 text-green-700 border-green-200' 
+                            : 'bg-red-50 text-red-700 border-red-200'
+                        }`}
+                      >
+                        <option value="unpaid">{language === 'ar' ? 'معلق / غير مدفوع' : 'Unpaid'}</option>
+                        <option value="paid">{language === 'ar' ? 'تم الدفع / مدفوع' : 'Paid'}</option>
+                      </select>
+                    </div>
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-neutral-400">

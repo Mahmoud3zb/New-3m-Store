@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 import { Order } from "../order-model";
 
 interface IRequest {
-    status: string;
+    status?: string;
+    isPaid?: boolean;
 }
 interface IResponse {
     message: string;
@@ -13,20 +14,38 @@ interface IResponse {
 export const updateOrderStatus: RequestHandler<{ id: string }, IResponse, IRequest> = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body;
+        const { status, isPaid } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid Order ID format" });
         }
 
-        const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: "Invalid status value" });
+        const updateFields: any = {};
+
+        if (status !== undefined) {
+            const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+            if (!validStatuses.includes(status)) {
+                return res.status(400).json({ message: "Invalid status value" });
+            }
+            updateFields.status = status;
+        }
+
+        if (isPaid !== undefined) {
+            updateFields.isPaid = isPaid;
+            if (isPaid) {
+                updateFields.paidAt = new Date();
+            } else {
+                updateFields.paidAt = null;
+            }
+        }
+
+        if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({ message: "No update fields provided" });
         }
 
         const updatedOrder = await Order.findByIdAndUpdate(
             id,
-            { status },
+            updateFields,
             { new: true }
         ).populate("userID", "name email");
 
@@ -34,10 +53,8 @@ export const updateOrderStatus: RequestHandler<{ id: string }, IResponse, IReque
             return res.status(404).json({ message: "Order not found" });
         }
 
-
-
         return res.status(200).json({
-            message: "Order status updated successfully",
+            message: "Order updated successfully",
             data: updatedOrder
         });
 

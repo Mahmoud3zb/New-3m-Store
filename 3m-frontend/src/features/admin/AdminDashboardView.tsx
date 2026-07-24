@@ -153,6 +153,17 @@ export default function AdminDashboardView() {
     }
   };
 
+  const handlePaymentStatusToggle = async (orderId: string, isPaid: boolean) => {
+    try {
+      await orderService.updateOrderStatus(orderId, undefined, isPaid);
+      toast.success(language === 'ar' ? 'تم تحديث حالة الدفع بنجاح!' : 'Payment status updated successfully!');
+      setOrders(prev => prev.map(o => o._id === orderId ? { ...o, isPaid } : o));
+    } catch (err) {
+      console.error('Failed to update payment status:', err);
+      toast.error(language === 'ar' ? 'فشل تحديث حالة الدفع' : 'Failed to update payment status');
+    }
+  };
+
   
   const openProductModal = (product: IProduct | null = null) => {
     setEditingProduct(product);
@@ -422,6 +433,7 @@ export default function AdminDashboardView() {
               expandedOrderID={expandedOrderID}
               setExpandedOrderID={setExpandedOrderID}
               handleStatusChange={handleStatusChange}
+              handlePaymentStatusToggle={handlePaymentStatusToggle}
               formatPrice={formatPrice}
             />
           )}

@@ -100,8 +100,8 @@ export const orderService = {
     return response.data.data;
   },
 
-  updateOrderStatus: async (id: string, status: string): Promise<{ message: string; data: IOrder }> => {
-    const response = await api.put<{ message: string; data: IOrder }>(`/order/${id}`, { status });
+  updateOrderStatus: async (id: string, status?: string, isPaid?: boolean): Promise<{ message: string; data: IOrder }> => {
+    const response = await api.put<{ message: string; data: IOrder }>(`/order/${id}`, { status, isPaid });
     return response.data;
   },
 
