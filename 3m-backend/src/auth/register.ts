@@ -51,7 +51,11 @@ export const registerHandler: RequestHandler<{}, {}, IRegisterBody> = async (req
                         { id: newUser._id, email: newUser.email, role: newUser.role },
                         { expiresIn: "3d" }
                 );
-                await emailService.sendEmailVerificationLink(newUser.email, token);
+                try {
+                        await emailService.sendEmailVerificationLink(newUser.email, token);
+                } catch (emailErr) {
+                        console.error("Verification email sending failed:", emailErr);
+                }
 
                 const userObj = newUser.toObject();
                 const { password: _, ...userWithoutPassword } = userObj;

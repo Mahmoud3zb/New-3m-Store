@@ -94,9 +94,9 @@ export function ProductsView() {
 
 
 
-  const handleAddToCart = (product: any) => {
-    addItem(product);
-  };
+  // const handleAddToCart = (product: any) => {
+  //   addItem(product);
+  // };
 
   const handleQuickAddSize = (product: any, size: string) => {
     const matchingVariant = product.variants?.find((v: any) => v.size === size && v.quantity > 0) 

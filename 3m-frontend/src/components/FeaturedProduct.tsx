@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { Heart } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { useLanguageStore } from '../store/languageStore'
-import { translations } from '../lib/translations'
+import { Heart } from 'lucide-react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { translations } from '../lib/translations'
 import { productService } from '../services/productService'
-import { useCartStore } from '../store/cartStore'
+// import { useCartStore } from '../store/cartStore'
+import { useLanguageStore } from '../store/languageStore'
 import { useWishlistStore } from '../store/wishlistStore'
 import { Skeleton } from './ui/skeleton'
 
@@ -29,7 +29,7 @@ const mockFeaturedItem = (lang: 'ar' | 'en') => ({
 
 export const FeaturedProduct: React.FC<FeaturedProductProps> = () => {
   const [selectedSize, setSelectedSize] = useState<string>('S')
-  const { addItem } = useCartStore()
+  // const { addItem } = useCartStore()
   const wishlistItems = useWishlistStore((state) => state.items)
   const toggleWishlist = useWishlistStore((state) => state.toggleWishlist)
   const { language } = useLanguageStore()
@@ -53,12 +53,12 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = () => {
     { label: 'L', disabled: true }, 
   ]
 
-  const handleAddToCart = () => {
-    addItem({
-      ...activeProduct,
-      selectedSize
-    })
-  }
+  // const handleAddToCart = () => {
+  //   addItem({
+  //     ...activeProduct,
+  //     selectedSize
+  //   })
+  // }
 
   if (isLoading) {
     return (
