@@ -1,19 +1,13 @@
 // for admin
 import { RequestHandler } from "express";
-import { IUser, User } from "../user-model";
+import { User } from "../user-model";
 import bcrypt from "bcrypt";
 
-interface IAddress {
-    street: string;
-    city: string;
-    country: string;
-}
 
 interface IRequest {
     name: string,
     email: string,
     password: string,
-    address: IAddress
 }
 interface IResponse {
     message: string,

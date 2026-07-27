@@ -24,7 +24,7 @@ export interface IUser extends mongoose.Document {
     name: string;
     email: string;
     password: string;
-    address: IAddress;
+    address?: IAddress[];
     profileImage?: string;
     isVerified: boolean;
     role: Role;
@@ -50,9 +50,15 @@ const UserSchema = new mongoose.Schema<IUser>({
         required: [true, "Password is required"]
     },
     address: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        country: { type: String, required: true }
+        type: [
+            {
+                street: String,
+                city: String,
+                country: String,
+                isDefault: Boolean
+            }
+        ],
+        default: [],
     },
     isVerified: {
         type: Boolean,
@@ -70,7 +76,7 @@ const UserSchema = new mongoose.Schema<IUser>({
     },
     profileImage: {
         type: String,
-        default: "https://default-avatar-url.com/avatar.png" 
+        default: "https://default-avatar-url.com/avatar.png"
     },
     passwordResetToken: String,
     passwordResetExpires: Date,

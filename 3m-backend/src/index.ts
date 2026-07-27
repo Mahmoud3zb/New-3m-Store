@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from 'path';
 import { Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -29,7 +30,7 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 dotenv.config();
 const app = express();
 // setupSwagger(app);
-const PORT = Number(process.env.PORT)|| 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const URI = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
 mongoose.connect(`${URI}/${DB_NAME}`)
@@ -58,7 +59,7 @@ mongoose.connect(`${URI}/${DB_NAME}`)
 
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL ||"https://3m-store2.vercel.app",
+        origin: process.env.FRONTEND_URL || "https://3m-store2.vercel.app",
         credentials: true,
     })
 )
@@ -92,7 +93,7 @@ app.use("/api/settings", settingsRouter);
 app.use("/api", checkMaintenance);
 
 app.use("/api/auth", sensitiveLimiter, authRouter);
-app.use("/api/user", userRouter); 
+app.use("/api/user", userRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
@@ -101,6 +102,9 @@ app.use("/api/review", reviewRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/promo", sensitiveLimiter, promoRouter);
 
+app.get('/test-google', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'test-google.html'));
+});
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     logger.error("Unhandled Global Error: %O", err);
@@ -132,25 +136,25 @@ app.get("/sitemap.xml", async (req, res) => {
         const baseUrl = process.env.FRONTEND_URL || "https://3m-store2.vercel.app";
         const products = await Product.find({}, "_id updatedAt");
         const categories = await Category.find({}, "_id updatedAt");
-        
+
         let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
         xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
         xml += `  <url>\n    <loc>${baseUrl}/</loc>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
         xml += `  <url>\n    <loc>${baseUrl}/shop</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
         xml += `  <url>\n    <loc>${baseUrl}/about</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
-        
+
         categories.forEach(cat => {
             const date = (cat as any).updatedAt ? new Date((cat as any).updatedAt).toISOString() : new Date().toISOString();
             xml += `  <url>\n    <loc>${baseUrl}/shop?categoryID=${cat._id}</loc>\n    <lastmod>${date}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
         });
-        
+
         products.forEach(prod => {
             const date = (prod as any).updatedAt ? new Date((prod as any).updatedAt).toISOString() : new Date().toISOString();
             xml += `  <url>\n    <loc>${baseUrl}/product/${prod._id}</loc>\n    <lastmod>${date}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
         });
-        
+
         xml += `</urlset>`;
-        
+
         res.header("Content-Type", "application/xml");
         res.status(200).send(xml);
     } catch (err) {
@@ -160,11 +164,11 @@ app.get("/sitemap.xml", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Backend is running");
+    res.send("Backend is running");
 });
 
 app.get("/api", (req, res) => {
-  res.send("API is running");
+    res.send("API is running");
 });
 
 export default app;
